@@ -21,7 +21,7 @@ class OnsConstituency < ApplicationRecord
   private
 
   def single_name_mapped_to_normalised_name(single_name)
-    compass_part = COMPASS_PARTS.detect{ |cp| single_name =~ Regexp.new(cp) }
+    compass_part = COMPASS_PARTS.detect{ |cp| single_name =~ / #{cp}$/ || single_name =~ /^#{cp} / }
     # puts "COMPASS PART #{compass_part} detected"
     unless compass_part.nil?
       non_compass_part = single_name.gsub(compass_part, "").gsub("  ", " ").strip
