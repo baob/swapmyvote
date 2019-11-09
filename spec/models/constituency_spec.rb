@@ -20,6 +20,7 @@ RSpec.describe Constituency, type: :model do
     "Plymouth Moorview" => "Plymouth, Moorview",
     "Southampton Test" => "Southampton, Test",
     "Ealing Southall" => "Ealing, Southall",
+    "Acton and Ealing Village" => "Acton and Ealing, Village",
     "Lewisham Deptford" => "Lewisham, Deptford"
 }
 
