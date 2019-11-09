@@ -41,13 +41,13 @@ class Constituency < ApplicationRecord
       end
     else
       name_parts = []
-      remainder = name.gsub(",", "")
+      remainder = name
     end
 
     remainder_split_by_and = remainder.match(/^(.*) and (.*)$/)
 
     if remainder_split_by_and.nil?
-      name_parts << remainder
+      name_parts += remainder.split(",").map(&:strip)
     else
       name_parts = name_parts +
         remainder_split_by_and.captures.first.split(",").map(&:strip) +

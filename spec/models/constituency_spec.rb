@@ -24,6 +24,7 @@ RSpec.describe Constituency, type: :model do
     "Ealing North" => "Ealing North",
     "Acton and Ealing Village" => "Acton|Ealing Village",
     "Sheffield, Brightside and Hillsborough" => "Sheffield|Brightside|Hillsborough",
+    "Coatbridge, Chryston and Bellshill" => "Coatbridge|Chryston|Bellshill",
     "Lewisham Deptford" => "Lewisham|Deptford",
     "Lewisham East" => "Lewisham East",
     "North Dorset" => "Dorset North",
