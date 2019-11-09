@@ -43,7 +43,15 @@ RSpec.describe Constituency, type: :model do
     "Acton and Ealing Village" => "Acton|Ealing Village",
     "Somewhere, SomewhereElse and Someplace" => "Somewhere|SomewhereElse|Someplace",
     "Lewisham Deptford" => "Lewisham Deptford",
-    "Lewisham East" => "Lewisham East"
+    "Lewisham East" => "Lewisham East",
+    "North Dorset" => "Dorset North",
+    "North East Glasgow" => "Glasgow North East",
+    "West Lancashire" => "Lancashire West",
+    "South Norfolk" => "Norfolk South",
+    "North West Hampshire" => "Hampshire North West",
+    "South East Sheffield" => "Sheffield South East",
+    "South West Hertfordshire" => "Hertfordshire South West",
+    "East Hampshire" => "Hampshire East",
   }
 
   describe '#name_mapped_to_ons_name' do
