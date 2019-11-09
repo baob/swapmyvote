@@ -41,6 +41,7 @@ RSpec.describe Constituency, type: :model do
     "Ealing Southall" => "Ealing Southall",
     "Ealing North" => "Ealing North",
     "Acton and Ealing Village" => "Acton|Ealing Village",
+    "Somewhere, SomewhereElse and Someplace" => "Somewhere|SomewhereElse|Someplace",
     "Lewisham Deptford" => "Lewisham Deptford",
     "Lewisham East" => "Lewisham East"
   }
