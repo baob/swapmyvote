@@ -16,12 +16,16 @@ RSpec.describe Constituency, type: :model do
     "Manchester Gorton" => "Manchester, Gorton",
     "Manchester Central" => "Manchester Central",
     "Sheffield Brightside and Hillsborough" => "Sheffield, Brightside and Hillsborough",
+    "Sheffield Central" => "Sheffield Central",
+    "Sheffield South East" => "Sheffield South East",
     "Brighton Kemptown" => "Brighton, Kemptown",
     "Plymouth Moorview" => "Plymouth, Moorview",
     "Southampton Test" => "Southampton, Test",
     "Ealing Southall" => "Ealing, Southall",
+    "Ealing North" => "Ealing North",
     "Acton and Ealing Village" => "Acton and Ealing, Village",
-    "Lewisham Deptford" => "Lewisham, Deptford"
+    "Lewisham Deptford" => "Lewisham, Deptford",
+    "Lewisham East" => "Lewisham East"
 }
 
 

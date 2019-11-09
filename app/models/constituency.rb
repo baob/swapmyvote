@@ -13,6 +13,12 @@ class Constituency < ApplicationRecord
     Lewisham
   ]
 
+  COMPASS_PARTS = [
+    "South East",
+    "East",
+    "North"
+  ]
+
   def name_mapped_to_ons_name
     name_split_by_and = name.match(/^(.*) and (.*)$/)
     return single_name_mapped_to_ons_name(name) if name_split_by_and.nil?
@@ -21,13 +27,15 @@ class Constituency < ApplicationRecord
 
   private
 
-  def single_name_mapped_to_ons_name(name)
-    name_first_word = name.strip.split(" ").first
-    return name if name == name_first_word
-    return name if name == "#{name_first_word} Central"
+  def single_name_mapped_to_ons_name(single_name)
+    name_first_word = single_name.strip.split(" ").first
+    compass_part = COMPASS_PARTS.detect{ |cp| "#{name_first_word} #{cp}" == single_name }
+    return single_name unless compass_part.nil?
+    return single_name if single_name == name_first_word
+    return single_name if single_name == "#{name_first_word} Central"
 
-    return name.gsub(name_first_word, name_first_word + ",") if SUBDIVIDED_CITIES.include?(name_first_word)
+    return single_name.gsub(name_first_word, name_first_word + ",") if SUBDIVIDED_CITIES.include?(name_first_word)
 
-    name
+    single_name
   end
 end
