@@ -33,7 +33,7 @@ class Constituency < ApplicationRecord
   def normalised_name
     name_split_by_and = name.match(/^(.*) and (.*)$/)
     return single_name_mapped_to_normalised_name(name) if name_split_by_and.nil?
-    name_parts = name_split_by_and.captures.first.split(',').map(&:strip) + [name_split_by_and.captures.last]
+    name_parts = name_split_by_and.captures.first.split(",").map(&:strip) + [name_split_by_and.captures.last]
     name_parts.map{ |n| single_name_mapped_to_normalised_name(n) }.join("|")
   end
 
@@ -56,9 +56,9 @@ class Constituency < ApplicationRecord
     name_first_word = single_name.strip.split(" ").first
 
     compass_part = COMPASS_PARTS.detect{ |cp| single_name =~ / #{cp}$/ || single_name =~ /^#{cp} / }
-    if !compass_part.nil?
+    unless compass_part.nil?
       # puts "COMPASS PART #{compass_part} detected"
-      return single_name.gsub(compass_part, '').strip + " #{compass_part}"
+      return single_name.gsub(compass_part, "").strip + " #{compass_part}"
     end
 
     return single_name if single_name == name_first_word
