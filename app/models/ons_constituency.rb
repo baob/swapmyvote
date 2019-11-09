@@ -14,7 +14,8 @@ class OnsConstituency < ApplicationRecord
     name_split_by_and = name.match(/^(.*) and (.*)$/)
     return single_name_mapped_to_normalised_name(name) if name_split_by_and.nil?
     # puts "MULTIPLE NAME DETECTED #{name}"
-    name_split_by_and.captures.map{ |n| single_name_mapped_to_normalised_name(n) }.join("|")
+    name_parts = name_split_by_and.captures.first.split(',').map(&:strip) + [name_split_by_and.captures.last]
+    name_parts.map{ |n| single_name_mapped_to_normalised_name(n) }.join("|")
   end
 
   private

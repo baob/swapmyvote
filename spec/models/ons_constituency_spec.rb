@@ -14,7 +14,9 @@ RSpec.describe OnsConstituency, type: :model do
     "North West Hampshire" => "Hampshire North West",
     "South East Sheffield" => "Sheffield South East",
     "South West Hertfordshire" => "Hertfordshire South West",
-    "East Hampshire" => "Hampshire East"
+    "East Hampshire" => "Hampshire East",
+    "Somewhere, SomewhereElse and Someplace" => "Somewhere|SomewhereElse|Someplace"
+
   }
 
   describe '#normalised_name' do
