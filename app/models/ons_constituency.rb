@@ -7,15 +7,29 @@ class OnsConstituency < ApplicationRecord
     "North",
     "East",
     "West",
-    "South"
+    "South",
+    "Central"
   ]
 
   def normalised_name
-    name_split_by_and = name.match(/^(.*) and (.*)$/)
-    return single_name_mapped_to_normalised_name(name.gsub(", ", " ")) if name_split_by_and.nil?
-    # puts "MULTIPLE NAME DETECTED #{name}"
-    name_parts = name_split_by_and.captures.first.split(",").map(&:strip) + [name_split_by_and.captures.last]
-    name_parts.map{ |n| single_name_mapped_to_normalised_name(n) }.join("|")
+    name_first_word = name.gsub(",", "").split(" ").first
+    return name if name == name_first_word
+
+    name_parts = []
+    remainder = name
+
+    remainder_split_by_and = remainder.match(/^(.*) and (.*)$/)
+
+    if remainder_split_by_and.nil?
+      name_parts = name_parts +
+        remainder.split(",").map(&:strip)
+    else
+      name_parts = name_parts +
+        remainder_split_by_and.captures.first.split(",").map(&:strip) +
+        [remainder_split_by_and.captures.last]
+    end
+
+    name_parts.select{ |p| p != "" }.map{ |n| single_name_mapped_to_normalised_name(n) }.join("|")
   end
 
   private

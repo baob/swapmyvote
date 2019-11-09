@@ -6,6 +6,16 @@ RSpec.describe OnsConstituency, type: :model do
   specify { expect(subject).to respond_to(:normalised_name) }
 
   normalised_examples = {
+    "Birmingham, Ladywood" => "Birmingham|Ladywood",
+    "Liverpool, Hallam" => "Liverpool|Hallam",
+    "Manchester, Gorton" => "Manchester|Gorton",
+    "Manchester Central" => "Manchester Central",
+    "Sheffield Central" => "Sheffield Central",
+    "Brighton, Kemptown" => "Brighton|Kemptown",
+    "Plymouth, Moorview" => "Plymouth|Moorview",
+    "Southampton,Test" => "Southampton|Test",
+    "Ealing, Southall" => "Ealing|Southall",
+    "Ealing North" => "Ealing North",
     "Acton and Ealing Village" => "Acton|Ealing Village",
     "North Dorset" => "Dorset North",
     "North East Glasgow" => "Glasgow North East",
@@ -15,8 +25,7 @@ RSpec.describe OnsConstituency, type: :model do
     "South East Sheffield" => "Sheffield South East",
     "South West Hertfordshire" => "Hertfordshire South West",
     "East Hampshire" => "Hampshire East",
-    "Somewhere, SomewhereElse and Someplace" => "Somewhere|SomewhereElse|Someplace",
-    "Birmingham, Ladywood" => "Birmingham Ladywood",
+    "Sheffield, Brightside and Hillsborough" => "Sheffield|Brightside|Hillsborough"
   }
 
   describe '#normalised_name' do
