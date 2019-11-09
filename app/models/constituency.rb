@@ -62,7 +62,7 @@ class Constituency < ApplicationRecord
     end
 
     return single_name if single_name == name_first_word
-    return single_name if single_name == "#{name_first_word} Central"
+    # return single_name if single_name == "#{name_first_word} Central"
 
     single_name
   end
