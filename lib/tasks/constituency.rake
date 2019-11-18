@@ -3,15 +3,17 @@ namespace :constituencies do
   desc "match the two constituency tables"
   task :match => :environment do
 
-    constituencies = Constituency.all.reduce({}){ |hash, c| hash[c.normalised_name] = c ; hash }
+    constituencies = Constituency.all.reduce({}){ |hash, c| hash[c.normalised_name] = { cons: c} ; hash }
     puts constituencies.take(3)
 
-    ons_constituencies = OnsConstituency.all.reduce({}){ |hash, c| hash[c.normalised_name] = c ; hash }
+    ons_constituencies = OnsConstituency.all.reduce({}){ |hash, c| hash[c.normalised_name] = { cons: c} ; hash }
     puts ons_constituencies.take(3)
   #  ons_constituencies = OnsConstituency.pluck(:ons_id, :name).reduce({}){ |hash, c|  hash[c[1]] = { ons_id: c[0], name: c[1] } ; hash }
 
     misses = 0
-    constituencies.each do |name, constituency|
+    constituencies.each do |name, cons_result|
+      constituency = cons_result[:cons]
+
       # name = constituency.name.strip
 
       # name = constituency.name_mapped_to_ons_name
@@ -28,7 +30,7 @@ namespace :constituencies do
         ons_keys = ons_constituencies.keys.select{ |name|  name.index(name_first)}
 
         ons_results = ons_keys.map do |ons_key|
-          { ons_key => ons_constituencies[ons_key].name }
+          { ons_key => ons_constituencies[ons_key][:cons].name }
         end
 
         puts "Close matches on #{name_first} from ONS: #{ons_results}"
