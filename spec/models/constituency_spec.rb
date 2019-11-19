@@ -35,6 +35,7 @@ RSpec.describe Constituency, type: :model do
     "South East Sheffield" => "Sheffield South East",
     "South West Hertfordshire" => "Hertfordshire South West",
     "East Hampshire" => "Hampshire East",
+    "Durham, City of" => "Durham, City of"
   }
 
   describe '#normalised_name' do

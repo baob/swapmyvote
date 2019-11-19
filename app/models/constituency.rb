@@ -25,7 +25,13 @@ class Constituency < ApplicationRecord
     "Central"
   ]
 
+  CITY_PART = /, City of$/
+
   def normalised_name
+    if name =~ CITY_PART
+      return name
+    end
+
     name_first_word = name.gsub(",", "").split(" ").first
     after_first_word = name.gsub(",", "").split(" ")[1..-1].join(" ")
     return name if name == name_first_word
