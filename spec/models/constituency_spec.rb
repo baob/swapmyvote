@@ -38,7 +38,7 @@ RSpec.describe Constituency, type: :model do
     "Durham, City of" => "Durham, City of"
   }
 
-  describe '#normalised_name' do
+  describe "#normalised_name" do
     normalised_examples.each do |(our_name, ons_name)|
       it "when given #{our_name}, returns #{ons_name}" do
         expect(described_class.new(name: our_name).normalised_name).to eql(ons_name)

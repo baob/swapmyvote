@@ -1,4 +1,4 @@
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe OnsConstituency, type: :model do
   specify { expect(subject).to respond_to(:name) }
@@ -29,13 +29,11 @@ RSpec.describe OnsConstituency, type: :model do
     "City of Durham" => "Durham, City of"
   }
 
-  describe '#normalised_name' do
+  describe "#normalised_name" do
     normalised_examples.each do |(our_name, ons_name)|
       it "when given #{our_name}, returns #{ons_name}" do
         expect(described_class.new(name: our_name).normalised_name).to eql(ons_name)
       end
     end
   end
-
-
 end
