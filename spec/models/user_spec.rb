@@ -210,4 +210,33 @@ RSpec.describe User, type: :model do
       end
     end
   end
+
+  describe "foreign key constraints" do
+    describe 'sent_emails' do
+      describe "#destroy" do
+        specify do
+          user = create(:user)
+          sent_email = create(:sent_email, user: user)
+          expect { user.destroy }.not_to raise_error
+        end
+      end
+
+      describe "#delete" do
+        specify do
+          user = create(:user)
+          sent_email = create(:sent_email, user: user)
+          expect { user.delete }.to raise_error(ActiveRecord::InvalidForeignKey)
+        end
+      end
+    end
+
+    describe 'identities' do
+      # TODO
+    end
+
+    describe 'mobile_phones' do
+      # TODO
+    end
+  end
+
 end
