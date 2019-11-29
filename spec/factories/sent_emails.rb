@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :sent_email do
-    user { user }
+    user { build(:user) }
     template { "MyString" }
   end
 end
