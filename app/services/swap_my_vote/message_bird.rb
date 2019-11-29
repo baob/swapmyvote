@@ -6,6 +6,7 @@ class SwapMyVote::MessageBird
 
     def verify_create(mobile_number, template)
       begin
+        # raise 'kaboom'
         otp = SwapMyVote::MessageBird.client.verify_create(
           mobile_number,
           originator: "SwapMyVote",
@@ -16,8 +17,11 @@ class SwapMyVote::MessageBird
       # Is it better to expose MessageBird errors directly to
       # the user?
       #
-      # rescue MessageBird::ErrorException => ex
-      #   return nil, errors_from_exception(ex)
+      rescue MessageBird::ErrorException => ex
+        # $stderr.puts "MessageBird exception - #{ex.description}"
+        # raise
+        $stderr.puts "MessageBird exception - #{ex.errors.first.description}"
+        return nil, errors_from_exception(ex)
       end
 
       return otp, nil
