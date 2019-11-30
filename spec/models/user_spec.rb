@@ -212,7 +212,14 @@ RSpec.describe User, type: :model do
   end
 
   describe "foreign key constraints" do
-    describe 'sent_emails' do
+    # specs arise out of issue https://github.com/swapmyvote/swapmyvote/issues/184
+    # This really just confirms active record is doing the expected thing, though
+    # it also confirms the relationships are workng correctly.
+    # CAVEAT: the delete spec will only work if the db has been created with foreign keys
+    # SO, a test database, typically created from db/schema.rb will cause the delete
+    # spec to fail.
+
+    describe "sent_emails" do
       describe "#destroy" do
         specify do
           user = create(:user)
@@ -230,13 +237,12 @@ RSpec.describe User, type: :model do
       end
     end
 
-    describe 'identities' do
+    describe "identities" do
       # TODO
     end
 
-    describe 'mobile_phones' do
+    describe "mobile_phones" do
       # TODO
     end
   end
-
 end
