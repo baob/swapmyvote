@@ -43,17 +43,19 @@ left join ons_constituencies on swing_raw.ons_id = ons_constituencies.ons_id
 
 select
   ons_constituencies.ons_id as ons_id,
+  ons_constituencies.name as constituency_name,
   parties.id as party_id,
+  parties.name as party_name,
   sum( case when onsa_id = ons_id THEN
       (case when party_up_a_id = parties.id THEN 1 else 0 end)
     else
       (case when party_up_b_id = parties.id THEN 1 else 0 end)
-    end) as partyup,
+    end) as gains,
   sum( case when onsa_id = ons_id THEN
       (case when party_up_a_id = parties.id THEN 0 else 1 end)
     else
       (case when party_up_b_id = parties.id THEN 0 else 1 end)
-    end) as partydown
+    end) as losses
 from (
   select swaps.id as swap_id, usersa.id as usersa_id, usersb.id as usersb_id,
     usersa.constituency_ons_id as onsa_id, usersb.constituency_ons_id as onsb_id,
@@ -64,4 +66,4 @@ from (
 ) as swing_raw
 left join parties  on swing_raw.party_up_a_id = parties.id or swing_raw.party_up_b_id = parties.id
 left join ons_constituencies  on swing_raw.onsa_id = ons_constituencies.ons_id or swing_raw.onsb_id = ons_constituencies.ons_id
-group by ons_constituencies.ons_id, parties.id
+group by ons_constituencies.ons_id, parties.id, ons_constituencies.name, parties.name
