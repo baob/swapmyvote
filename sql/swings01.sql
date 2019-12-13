@@ -46,6 +46,7 @@ select
   ons_constituencies.name as constituency_name,
   parties.id as party_id,
   parties.name as party_name,
+  polls.marginal_score/100.0 as marginal_pc,
   sum( case when onsa_id = ons_id THEN
       (case when party_up_a_id = parties.id THEN 1 else 0 end)
     else
@@ -63,7 +64,9 @@ from (
   from swaps
   left join users as usersa on usersa.swap_id = swaps.id
   left join users as usersb on swaps.chosen_user_id = usersb.id
+  and swaps.confirmed = true
 ) as swing_raw
 left join parties  on swing_raw.party_up_a_id = parties.id or swing_raw.party_up_b_id = parties.id
 left join ons_constituencies  on swing_raw.onsa_id = ons_constituencies.ons_id or swing_raw.onsb_id = ons_constituencies.ons_id
-group by ons_constituencies.ons_id, parties.id, ons_constituencies.name, parties.name
+left outer join polls on polls.constituency_ons_id = ons_constituencies.ons_id and polls.party_id = parties.id
+group by ons_constituencies.ons_id, parties.id, ons_constituencies.name, parties.name, polls.marginal_score
