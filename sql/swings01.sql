@@ -41,17 +41,15 @@ left join parties  on swing_raw.willing_party_id = parties.id or swing_raw.prefe
 left join ons_constituencies on swing_raw.ons_id = ons_constituencies.ons_id
 
 
-select swap_id, usersa_id, usersb_id,
-  onsa_id, onsb_id,
+select
   ons_constituencies.ons_id as ons_id,
-  party_up_a_id, party_up_b_id,
   parties.id as party_id,
-  ( case when onsa_id = ons_id THEN
+  sum( case when onsa_id = ons_id THEN
       (case when party_up_a_id = parties.id THEN 1 else 0 end)
     else
       (case when party_up_b_id = parties.id THEN 1 else 0 end)
     end) as partyup,
-  ( case when onsa_id = ons_id THEN
+  sum( case when onsa_id = ons_id THEN
       (case when party_up_a_id = parties.id THEN 0 else 1 end)
     else
       (case when party_up_b_id = parties.id THEN 0 else 1 end)
@@ -63,10 +61,7 @@ from (
   from swaps
   left join users as usersa on usersa.swap_id = swaps.id
   left join users as usersb on swaps.chosen_user_id = usersb.id
-  limit 10
 ) as swing_raw
 left join parties  on swing_raw.party_up_a_id = parties.id or swing_raw.party_up_b_id = parties.id
 left join ons_constituencies  on swing_raw.onsa_id = ons_constituencies.ons_id or swing_raw.onsb_id = ons_constituencies.ons_id
-
-
-
+group by ons_constituencies.ons_id, parties.id
