@@ -40,10 +40,20 @@ from (
 left join parties  on swing_raw.willing_party_id = parties.id or swing_raw.preferred_party_id = parties.id
 left join ons_constituencies on swing_raw.ons_id = ons_constituencies.ons_id
 
-select swaps.id as swap_id, usersa.id as usersa_id, usersb.id as usersb_id,
-  usersa.constituency_ons_id as onsa_id, usersb.constituency_ons_id as onsb_id,
-  usersa.willing_party_id as party_up_a_id, usersb.willing_party_id as party_up_b_id
-from swaps
-left join users as usersa on usersa.swap_id = swaps.id
-left join users as usersb on swaps.chosen_user_id = usersb.id
+
+select swap_id, usersa_id, usersb_id,
+  onsa_id, onsb_id,
+  ons_constituencies.ons_id as ons_id
+  party_up_a_id, party_up_b_id,
+  parties.id as party_id
+from (
+  select swaps.id as swap_id, usersa.id as usersa_id, usersb.id as usersb_id,
+    usersa.constituency_ons_id as onsa_id, usersb.constituency_ons_id as onsb_id,
+    usersa.willing_party_id as party_up_a_id, usersb.willing_party_id as party_up_b_id
+  from swaps
+  left join users as usersa on usersa.swap_id = swaps.id
+  left join users as usersb on swaps.chosen_user_id = usersb.id
   limit 10
+) as swing_raw
+left join parties  on swing_raw.party_up_a_id = parties.id or swing_raw.party_up_b_id = parties.id
+left join ons_constituencies  on swing_raw.onsa_id = ons_constituencies.ons_id or swing_raw.onsb_id = ons_constituencies.ons_id
