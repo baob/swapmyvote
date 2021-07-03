@@ -12,7 +12,7 @@ class Party < ApplicationRecord
     brexit: { name: "Brexit", color: "#5bc0de" },
     breakthrough: { name: " Breakthrough" },
     for_britain: { name: "For Britain" },
-    freedom_alliance: { name: "Freedom Alliance" },
+    freedom_alliance: { name: "Freedom Alliance- Integrity, Society, Economy" },
     independent: { name: "Independent" },
     reform_uk: { name: "Reform uk" },
     rejoin_eu: { name: "Rejoin eu" },
