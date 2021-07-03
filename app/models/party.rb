@@ -37,7 +37,7 @@ class Party < ApplicationRecord
     def master_list
       REFERENCE_DATA.map do |(short_code, attributes)|
         attributes.merge(
-          canonical_name: attributes[:name].parameterize(separator: "_").to_sym,
+          canonical_name: attributes[:name].gsub(/[^A-Za-z0-9]/, "_").parameterize(separator: "_").to_sym,
           short_code: short_code
         )
       end
