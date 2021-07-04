@@ -6,6 +6,19 @@ RSpec.describe Party, type: :model do
 
   it { is_expected.to respond_to :polls }
 
+  describe ".canonical_name_for" do
+    examples = {
+      "Liberal Democrats" => "liberal_democrats",
+      "Labour Party" => "labour",
+      "Freedom Alliance- Integrity, Society, Economy" => "freedom_alliance_integrity_society_economy"
+    }
+    examples.each do |from, to|
+      it "maps from #{from} to #{to}" do
+        expect(described_class.canonical_name_for(from)).to eq(to)
+      end
+    end
+  end
+
   # refer to api docs at app/views/static_pages/api.html.haml
   describe ".canonical_names" do
     %w[

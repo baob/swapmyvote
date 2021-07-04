@@ -21,8 +21,7 @@ module ApplicationHelper
   end
 
   def canonical_name(name)
-    return nil if name.nil?
-    return name.gsub(/[^A-Za-z0-9]/, "_").parameterize(separator: "_").gsub(/\_party$/, "")
+    Party.canonical_name_for(name)
   end
 
   def github_url
