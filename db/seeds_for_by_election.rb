@@ -11,10 +11,6 @@ require_relative "fixtures/be2022/party"
 require_relative "fixtures/be2022/candidate"
 require_relative "../app/helpers/application_helper"
 
-class SeedHelper
-  include ApplicationHelper
-end
-
 puts "\nParties"
 
 Db::Fixtures::Be2022::Party.all.each do |party|
@@ -74,8 +70,9 @@ puts "\n\nVerifying canonical names include in api\n\n"
 party_canonical_names = Party.canonical_names
 
 Party.all.each do |party|
-  unless party_canonical_names.include?(SeedHelper.new.canonical_name(party.name))
-    puts "ERROR: canonical name for party #{party.name} not included in Party.REFERENCE_DATA - it's needed for API"
+  canonical_name = Party.canonical_name_for(party.name)
+  unless party_canonical_names.include?(canonical_name)
+    puts "ERROR: canonical name (#{canonical_name}) for party #{party.name} not included in Party.REFERENCE_DATA"
   end
   print "."
 end

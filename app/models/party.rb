@@ -22,6 +22,11 @@ class Party < ApplicationRecord
   }
 
   class << self
+    def canonical_name_for(name)
+      return nil if name.nil?
+      return name.gsub(/[^A-Za-z0-9]/, "_").parameterize(separator: "_").gsub(/\_party$/, "")
+    end
+
     def canonical_names
       master_list.map { |p| p[:canonical_name].to_s }
     end
@@ -37,7 +42,7 @@ class Party < ApplicationRecord
     def master_list
       REFERENCE_DATA.map do |(short_code, attributes)|
         attributes.merge(
-          canonical_name: attributes[:name].gsub(/[^A-Za-z0-9]/, "_").parameterize(separator: "_").to_sym,
+          canonical_name: canonical_name_for(attributes[:name]).to_sym,
           short_code: short_code
         )
       end
