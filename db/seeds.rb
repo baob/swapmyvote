@@ -20,7 +20,8 @@ ec_parties_by_name = ec_parties.each_with_object({}) do |party, index|
   names = party[:regulated_entity_names] + party[:descriptions]
   names << party[:name]
 
-  names.each do |name|
+  names.each do |full_ec_name|
+    name = Party.canonical_name_for(full_ec_name)
     index[name] = party
     index[name][:shortest_name] = names.sort { |a, b| a.length <=> b.length }.first
   end
@@ -30,7 +31,8 @@ puts "\nParties"
 
 Db::Fixtures::Be2021::Party.all.each do |party|
   party_name = party[:name].strip
-  unless ec_parties_by_name[party_name]
+  party_canonical_name = Party.canonical_name_for(party_name)
+  unless ec_parties_by_name[party_canonical_name]
     puts "party #{party} from BE2021 yaml file not found in Electoral Commission data"
     puts "try one of these \n"
     puts ec_parties_by_name.keys.sort.join("|")
