@@ -10,7 +10,9 @@ RSpec.describe Party, type: :model do
     examples = {
       "Liberal Democrats" => "liberal_democrats",
       "Labour Party" => "labour",
-      "Freedom Alliance- Integrity, Society, Economy" => "freedom_alliance_integrity_society_economy"
+      "Freedom Alliance- Integrity, Society, Economy" => "freedom_alliance_integrity_society_economy",
+      "The Purple Party" => "purple",
+      "The Purple Party Candidate" => "purple"
     }
     examples.each do |from, to|
       it "maps from #{from} to #{to}" do

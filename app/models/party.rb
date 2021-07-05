@@ -24,7 +24,11 @@ class Party < ApplicationRecord
   class << self
     def canonical_name_for(name)
       return nil if name.nil?
-      return name.gsub(/[^A-Za-z0-9]/, "_").parameterize(separator: "_").gsub(/\_party$/, "")
+      return name.gsub(/[^A-Za-z0-9]/, "_")
+        .parameterize(separator: "_")
+        .gsub(/\_candidate$/, "").strip
+        .gsub(/\_party$/, "").strip
+        .gsub(/^the\_/, "").strip
     end
 
     def canonical_names
