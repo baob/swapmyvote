@@ -3,12 +3,12 @@
   - :name: Chesham and Amersham
     :ons_id: E14000631
     :candidates:
-      - :party_name: Green Party
+      - :party_name: Green
         :name: Carolyne Culver
         :colour: "#008066"
         :votes_count: 3_042
         :votes_percent: 5.5
-      - :party_name: Conservatives
+      - :party_name: Conservative
         :name: Peter Fleet
         :colour: "#0087DC"
         :votes_count: 30_850
@@ -28,7 +28,7 @@
         :colour:
         :votes_count:
         :votes_percent:
-      - :party_name: Labour Party
+      - :party_name: Labour
         :name: Natasa Pantelic
         :colour: "#DC241f"
         :votes_count: 7_166
@@ -36,12 +36,12 @@
   - :name: Batley and Spen
     :ons_id: E14000548
     :candidates:
-      - :party_name: Labour Party
+      - :party_name: Labour
         :name: Kim Leadbeater
         :colour: "#DC241f"
         :votes_count: 22_594
         :votes_percent: 42.7
-      - :party_name: Conservatives
+      - :party_name: Conservative
         :name: Ryan Stephenson
         :colour: "#0087DC"
         :votes_count: 19_069
@@ -51,7 +51,7 @@
         :colour: "#FDBB30"
         :votes_count: 2,462
         :votes_percent: 4.7
-      - :party_name: Green Party
+      - :party_name: Green
         :name: Ross Peltier
         :colour: "#008066"
         :votes_count: 692
