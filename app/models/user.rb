@@ -109,15 +109,21 @@ class User < ApplicationRecord
   end
 
   def try_to_create_potential_swap
+    logger.debug "==== 1.1 in try_to_create_potential_swap"
     swaps = complementary_voters.where("constituency_ons_id like '_%'")
-    return one_swap_from_possible_users(swaps)
+    swap = one_swap_from_possible_users(swaps)
+    logger.debug "==== 1.2 in try_to_create_potential_swap: selected from #{swaps.count} swaps: #{swap}"
+    return swap
   end
 
   def try_to_create_marginal_swap
+    logger.debug "==== 2.1 in try_to_create_marginal_swap constituencies: #{marginal_polls.map(&:constituency_ons_id)}"
     swaps = complementary_voters.where(
       { constituency_ons_id: marginal_polls.map(&:constituency_ons_id) }
     )
-    return one_swap_from_possible_users(swaps)
+    swap = one_swap_from_possible_users(swaps)
+    logger.debug "==== 2.2 in try_to_create_marginal_swap: selected from #{swaps.count} swaps: #{swap}"
+    return swap
   end
 
   private def complementary_voters
