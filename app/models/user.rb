@@ -126,7 +126,7 @@ class User < ApplicationRecord
     return swap
   end
 
-  private def complementary_voters
+  def complementary_voters
     User.where(
       preferred_party_id: willing_party_id,
       willing_party_id: preferred_party_id
