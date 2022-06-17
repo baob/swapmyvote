@@ -135,10 +135,14 @@ class User < ApplicationRecord
 
   private def one_swap_from_possible_users(user_query)
     offset = rand(user_query.count)
+    logger.debug "==== 3.1 in one_swap_from_possible_users: count: #{user_query.count} chosen offset #{offset} - all constituencies #{user_query.map(&:constituency).map(&:name)}"
     target_user = user_query.offset(offset).take
+    logger.debug "==== 3.2 chosen user constituency #{target_user&.constituency&.name}"
     return nil unless target_user
     # We need emails to send confirmation emails
-    return nil if target_user.email.blank?
+    if target_user.email.blank?
+      return nil
+    end
     # Don't include if already swapped
     return nil if target_user.swap
     # Ignore if already included
@@ -148,6 +152,7 @@ class User < ApplicationRecord
     # Ignore if my constituency
     return nil if target_user.constituency_ons_id == constituency_ons_id
     # Success
+    logger.debug "==== 3.3 chosen user constituency AFTER FILTERING #{target_user&.constituency&.name}"
     return potential_swaps.create(target_user: target_user)
   end
 
