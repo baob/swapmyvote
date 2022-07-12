@@ -30,4 +30,21 @@ class OnsConstituency < ApplicationRecord
   def marginal_for_user?(user)
     marginal? && parties_by_marginal_score[0..1].include?(user.preferred_party)
   end
+
+  def voter_type(user)
+    if marginal_for_user?(user)
+      return "fighting"
+    elsif winner_for_user?
+      return "winning"
+    end
+    return "losing"
+  end
+
+  def constituency_type
+    marginal ? "marginal" : "safe"
+  end
+
+  def combined_type(u)
+    voter_type(u) + "-" + constituency_type
+  end
 end
