@@ -61,6 +61,24 @@ namespace :swaps do
 
       puts "\n\nDIFFERENTIAL GAINS"
       puts diff_gains.map{ |(id,type)| type }.tally
+
+      swapper_ids = voters.map{ |(id, type)| id}
+
+      not_swaps = User.where("id not in (?)", swapper_ids)
+
+      not_swap_result = Hash.new
+
+      not_swaps.each do |user|
+        unless user.constituency.nil? || user.preferred_party.nil?
+          type = user.constituency.combined_type(user)
+          not_swap_result[user.id] = type
+        end
+      end
+
+      puts "\n\nUSERS WHO DIDN'T SWAP"
+      puts not_swap_result.map{ |(id,type)| type }.tally
+
+
     end
   end
 end
