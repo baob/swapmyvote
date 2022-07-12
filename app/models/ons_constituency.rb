@@ -19,7 +19,7 @@ class OnsConstituency < ApplicationRecord
     @polls_by_marginal_score = polls.order(:marginal_score)
   end
 
-  MARGINAL_THRESHOLD = 2500
+  MARGINAL_THRESHOLD = 3000
 
   def marginal?
     polls_by_marginal_score.first.marginal_score <= MARGINAL_THRESHOLD
