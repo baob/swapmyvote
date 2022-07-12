@@ -42,14 +42,17 @@ class OnsConstituency < ApplicationRecord
   def voter_type(user)
     if marginal_for_user?(user)
       return "fighting"
-    elsif winner_for_user?
+    elsif winner_for_user?(user)
       return "winning"
+    elsif loser_for_user?(user)
+      return "loser"
     end
-    return "losing"
+    return "unknown"
   end
 
   def constituency_type
-    marginal ? "marginal" : "safe"
+    return "unknown" if !marginal_known?
+    marginal? ? "marginal" : "safe"
   end
 
   def combined_type(u)
