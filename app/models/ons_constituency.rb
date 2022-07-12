@@ -45,9 +45,9 @@ class OnsConstituency < ApplicationRecord
     elsif winner_for_user?(user)
       return "winning"
     elsif loser_for_user?(user)
-      return "loser"
+      return "losing"
     end
-    return "unknown"
+    return "win_fight_lose_unknown"
   end
 
   def constituency_type
