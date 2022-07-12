@@ -19,12 +19,22 @@ class OnsConstituency < ApplicationRecord
     @polls_by_marginal_score = polls.order(:marginal_score)
   end
 
+  MARGINAL_THRESHOLD = 2500
+
   def marginal?
-    polls_by_marginal_score.first.marginal_score <= 1000
+    polls_by_marginal_score.first.marginal_score <= MARGINAL_THRESHOLD
   end
 
   def marginal_known?
     polls_by_marginal_score.count > 0
+  end
+
+  def marginal_degree
+    msf = polls_by_marginal_score.first.marginal_score
+    return "" if msf > MARGINAL_THRESHOLD
+    return "-loose" if msf > MARGINAL_THRESHOLD/2
+    return "-tight" if msf > 400
+    return "-ultra"
   end
 
   def winner_for_user?(user)
@@ -69,7 +79,7 @@ class OnsConstituency < ApplicationRecord
 
   def constituency_type
     return "ms_unknown" if !marginal_known?
-    marginal? ? "marginal" : "safe"
+    (marginal? ? "marginal" : "safe")  + marginal_degree
   end
 
   def combined_type(u)
