@@ -23,4 +23,35 @@ namespace :swaps do
     ActiveRecord::Base.logger = Logger.new STDOUT
     Swap.cancel_old
   end
+
+  namespace :analysis do
+    desc "breakdown the swaps"
+    task breakdown: :environment do
+      swaps = Swap.where(confirmed: true).all
+
+      voters = Hash.new
+      voter_gains =Hash.new
+
+      swaps.each do |swap|
+        u1 = swap.choosing_user
+        u2 = swap.chosen_user
+
+        u1_type = u1.constituency.combined_type(u1)
+        u2_type = u2.constituency.combined_type(u2)
+
+        u1_gain_type = u2.constituency.combined_type(u1)
+        u2_gain_type = u1.constituency.combined_type(u2)
+
+        voters[u1_type] ||= 0
+        voters[u1_type] += 1
+
+        voters[u2_type] ||= 0
+        voters[u2_type] += 1
+      end
+
+      puts "\n\nVOTERS"
+      puts voters
+
+    end
+  end
 end
