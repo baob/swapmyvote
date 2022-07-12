@@ -30,7 +30,8 @@ namespace :swaps do
       swaps = Swap.where(confirmed: true).all
 
       voters = Hash.new
-      voter_gains =Hash.new
+      voter_gains = Hash.new
+      diff_gains = Hash.new
 
       swaps.each do |swap|
         u1 = swap.choosing_user
@@ -42,16 +43,24 @@ namespace :swaps do
         u1_gain_type = u2.constituency.combined_type(u1)
         u2_gain_type = u1.constituency.combined_type(u2)
 
-        voters[u1_type] ||= 0
-        voters[u1_type] += 1
+        voters[u1.id] = u1_type
+        voters[u2.id] = u2_type
 
-        voters[u2_type] ||= 0
-        voters[u2_type] += 1
+        voter_gains[u1.id] = u1_type + "-GAINS-" + u1_gain_type
+        voter_gains[u2.id] = u2_type + "-GAINS-" + u2_gain_type
+
+        diff_gains[u1.id] = "MY-GAIN-" + u1_gain_type + "-SWAPPER-GAIN-" + u2_gain_type
+        diff_gains[u2.id] = "MY-GAIN-" + u2_gain_type + "-SWAPPER-GAIN-" + u1_gain_type
       end
 
       puts "\n\nVOTERS"
-      puts voters
+      puts voters.map{ |(id,type)| type }.tally
 
+      puts "\n\nIMMEDIATE VOTER GAINS"
+      puts voter_gains.map{ |(id,type)| type }.tally
+
+      puts "\n\nDIFFERENTIAL GAINS"
+      puts diff_gains.map{ |(id,type)| type }.tally
     end
   end
 end
