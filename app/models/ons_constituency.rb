@@ -19,7 +19,7 @@ class OnsConstituency < ApplicationRecord
     @polls_by_marginal_score = polls.order(:marginal_score)
   end
 
-  MARGINAL_THRESHOLD = 1000
+  MARGINAL_THRESHOLD = 3000
 
   def marginal?
     polls_by_marginal_score.first.marginal_score <= MARGINAL_THRESHOLD
@@ -30,12 +30,12 @@ class OnsConstituency < ApplicationRecord
   end
 
   def marginal_degree
-    return ""
-    # msf = polls_by_marginal_score.first.marginal_score
-    # return "" if msf > MARGINAL_THRESHOLD
-    # return "-C" if msf > 0.666 * MARGINAL_THRESHOLD
-    # return "-B" if msf >  0.333 * MARGINAL_THRESHOLD
-    # return "-A"
+    # return ""
+    msf = polls_by_marginal_score.first.marginal_score
+    return "" if msf > 3000
+    return "-C" if msf > 2000
+    return "-B" if msf > 1000
+    return "-A"
   end
 
   def winner_for_user?(user)
@@ -52,14 +52,10 @@ class OnsConstituency < ApplicationRecord
 
   def voter_type(user)
     return "wfl_unknown_" + user.preferred_party.name if !marginal_known?
-    if marginal_for_user?(user)
-      if !marginal?
-        dump_before_raise(user)
-        raise "what went wrong to classify this as fighting_safe"
-      end
-      return "fighting"
-    elsif winner_for_user?(user)
+    if winner_for_user?(user)
       return "winning"
+    elsif marginal_for_user?(user)
+      return "fighting"
     elsif loser_for_user?(user)
       return "losing"
     end
@@ -80,7 +76,7 @@ class OnsConstituency < ApplicationRecord
 
   def constituency_type
     return "ms_unknown" if !marginal_known?
-    (marginal? ? "marginal" : "safe")  + marginal_degree
+    (marginal? ? "marginal" : "safe") + marginal_degree
   end
 
   def combined_type(u)

@@ -27,6 +27,11 @@ namespace :swaps do
   namespace :analysis do
     desc "breakdown the swaps"
     task breakdown: :environment do
+
+      def sort_hash_by_value(d)
+        d.to_a.sort{ |x,y| x.last <=> y.last }.to_h
+      end
+
       swaps = Swap.where(confirmed: true).all
 
       voters = Hash.new
@@ -45,6 +50,23 @@ namespace :swaps do
         u1_gain_type = u2.constituency.combined_type(u1)
         u2_gain_type = u1.constituency.combined_type(u2)
 
+
+        if (u1_gain_type == 'losing-safe' && u2_gain_type == 'losing-safe')
+          # puts "\nBEFORE SWAP"
+          # u1.constituency.dump_before_raise(u1)
+          # u2.constituency.dump_before_raise(u2)
+          # puts "\nAFTER SWAP"
+          # u1.constituency.dump_before_raise(u2)
+          # u2.constituency.dump_before_raise(u1)
+          # raise "first double loosing safe"
+
+          # u1_type = u1_type + u1.constituency.marginal_degree
+          # u2_type = u2_type + u2.constituency.marginal_degree
+
+          # u1_gain_type = u1_gain_type + u2.constituency.marginal_degree
+          # u2_gain_type = u2_gain_type + u1.constituency.marginal_degree
+        end
+
         voters[u1.id] = u1_type
         voters[u2.id] = u2_type
 
@@ -59,16 +81,20 @@ namespace :swaps do
       end
 
       puts "\n\nVOTERS"
-      puts voters.map{ |(id,type)| type }.tally
+      # puts voters.map{ |(id,type)| type }.tally
+      pp sort_hash_by_value(voters.map{ |(id,type)| type }.tally)
 
       puts "\n\nIMMEDIATE VOTER GAINS"
-      puts voter_gains.map{ |(id,type)| type }.tally
+      # puts voter_gains.map{ |(id,type)| type }.tally
+      pp sort_hash_by_value(voter_gains.map{ |(id,type)| type }.tally)
 
       puts "\n\nDIFFERENTIAL GAINS"
-      puts diff_gains.map{ |(id,type)| type }.tally
+      # puts diff_gains.map{ |(id,type)| type }.tally
+      pp sort_hash_by_value( diff_gains.map{ |(id,type)| type }.tally )
 
       puts "\n\n3-WAY DIFFERENTIAL GAINS"
-      puts diff_3_gains.map{ |(id,type)| type }.tally
+      # puts diff_3_gains.map{ |(id,type)| type }.tally
+      pp sort_hash_by_value(diff_3_gains.map{ |(id,type)| type }.tally)
 
       swapper_ids = voters.map{ |(id, type)| id}
 
@@ -84,7 +110,8 @@ namespace :swaps do
       end
 
       puts "\n\nUSERS WHO DIDN'T SWAP"
-      puts not_swap_result.map{ |(id,type)| type }.tally
+      # puts not_swap_result.map{ |(id,type)| type }.tally
+      pp sort_hash_by_value(not_swap_result.map{ |(id,type)| type }.tally)
 
 
     end
