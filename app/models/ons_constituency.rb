@@ -28,30 +28,47 @@ class OnsConstituency < ApplicationRecord
   end
 
   def winner_for_user?(user)
-    marginal_known? && !marginal? && parties_by_marginal_score.first == user.preferred_party
+    marginal_known? && !marginal? && parties_by_marginal_score.first.id == user.preferred_party.id
   end
 
   def loser_for_user?(user)
-    marginal_known? && !marginal? && parties_by_marginal_score.first != user.preferred_party
+    marginal_known? && !winner_for_user?(user) && !marginal_for_user?(user)
   end
 
   def marginal_for_user?(user)
-    marginal_known? && marginal? && parties_by_marginal_score[0..1].include?(user.preferred_party)
+    marginal_known? && marginal? && parties_by_marginal_score[0..1].map(&:id).include?(user.preferred_party.id)
   end
 
   def voter_type(user)
+    return "wfl_unknown_" + user.preferred_party.name if !marginal_known?
     if marginal_for_user?(user)
+      if !marginal?
+        dump_before_raise(user)
+        raise "what went wrong to classify this as fighting_safe"
+      end
       return "fighting"
     elsif winner_for_user?(user)
       return "winning"
     elsif loser_for_user?(user)
       return "losing"
     end
-    return "win_fight_lose_unknown"
+  end
+
+  def dump_before_raise(user)
+    puts "\n\n"
+    puts user.attributes
+    puts "marginal?", marginal? if  marginal_known?
+    puts "marginal_known?", marginal_known?
+    puts "winner_for_user?(user)", winner_for_user?(user)
+    puts "loser_for_user?(user)", loser_for_user?(user)
+    puts "marginal_for_user?(user)", marginal_for_user?(user)
+    # puts user.party
+    puts self.attributes
+    puts polls.map(&:attributes)
   end
 
   def constituency_type
-    return "unknown" if !marginal_known?
+    return "ms_unknown" if !marginal_known?
     marginal? ? "marginal" : "safe"
   end
 
