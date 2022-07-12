@@ -23,12 +23,20 @@ class OnsConstituency < ApplicationRecord
     polls_by_marginal_score.first.marginal_score <= 1000
   end
 
+  def marginal_known?
+    polls_by_marginal_score.count > 0
+  end
+
   def winner_for_user?(user)
-    !marginal? && parties_by_marginal_score.first == user.preferred_party
+    marginal_known? && !marginal? && parties_by_marginal_score.first == user.preferred_party
+  end
+
+  def loser_for_user?(user)
+    marginal_known? && !marginal? && parties_by_marginal_score.first != user.preferred_party
   end
 
   def marginal_for_user?(user)
-    marginal? && parties_by_marginal_score[0..1].include?(user.preferred_party)
+    marginal_known? && marginal? && parties_by_marginal_score[0..1].include?(user.preferred_party)
   end
 
   def voter_type(user)
