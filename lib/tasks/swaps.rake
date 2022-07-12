@@ -33,6 +33,8 @@ namespace :swaps do
       voter_gains = Hash.new
       diff_gains = Hash.new
 
+      diff_3_gains = Hash.new
+
       swaps.each do |swap|
         u1 = swap.choosing_user
         u2 = swap.chosen_user
@@ -51,6 +53,9 @@ namespace :swaps do
 
         diff_gains[u1.id] = "MY-GAIN-" + u1_gain_type + "-SWAPPER-GAIN-" + u2_gain_type
         diff_gains[u2.id] = "MY-GAIN-" + u2_gain_type + "-SWAPPER-GAIN-" + u1_gain_type
+
+        diff_3_gains[u1.id] = u1_type + "-MY-GAIN-" + u1_gain_type + "-SWAPPER-GAIN-" + u2_gain_type
+        diff_3_gains[u2.id] = u2_type + "-MY-GAIN-" + u2_gain_type + "-SWAPPER-GAIN-" + u1_gain_type
       end
 
       puts "\n\nVOTERS"
@@ -61,6 +66,9 @@ namespace :swaps do
 
       puts "\n\nDIFFERENTIAL GAINS"
       puts diff_gains.map{ |(id,type)| type }.tally
+
+      puts "\n\n3-WAY DIFFERENTIAL GAINS"
+      puts diff_3_gains.map{ |(id,type)| type }.tally
 
       swapper_ids = voters.map{ |(id, type)| id}
 
