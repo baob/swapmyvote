@@ -30,11 +30,12 @@ class OnsConstituency < ApplicationRecord
   end
 
   def marginal_degree
-    msf = polls_by_marginal_score.first.marginal_score
-    return "" if msf > MARGINAL_THRESHOLD
-    return "-loose" if msf > MARGINAL_THRESHOLD/2
-    return "-tight" if msf > 400
-    return "-ultra"
+    return ""
+    # msf = polls_by_marginal_score.first.marginal_score
+    # return "" if msf > MARGINAL_THRESHOLD
+    # return "-loose" if msf > MARGINAL_THRESHOLD/2
+    # return "-tight" if msf > 400
+    # return "-ultra"
   end
 
   def winner_for_user?(user)
