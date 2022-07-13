@@ -37,6 +37,7 @@ namespace :swaps do
       voters = Hash.new
       voter_gains = Hash.new
       diff_gains = Hash.new
+      pairs = Hash.new
 
       diff_3_gains = Hash.new
 
@@ -78,6 +79,9 @@ namespace :swaps do
           # u2_gain_type = u2_gain_type + u1.constituency.marginal_degree
         end
 
+        pairs[u1.id] = u1_type + "-SWAPPED_WITH-" + u2_type
+        pairs[u2.id] = u2_type + "-SWAPPED_WITH-" + u1_type
+
         voters[u1.id] = u1_type + (u1.constituency.user_is_defeater?(u1) ? "-defeater" : "")
         voters[u2.id] = u2_type + (u2.constituency.user_is_defeater?(u2) ? "-defeater" : "")
 
@@ -94,6 +98,9 @@ namespace :swaps do
       puts "\n\nVOTERS"
       # puts voters.map{ |(id,type)| type }.tally
       pp sort_hash_by_value(voters.map{ |(id,type)| type }.tally)
+
+      puts "\n\nVOTER PAIRS"
+      pp sort_hash_by_value(pairs.map{ |(id,type)| type }.tally)
 
       puts "\n\nIMMEDIATE VOTER GAINS"
       # puts voter_gains.map{ |(id,type)| type }.tally
