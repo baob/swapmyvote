@@ -79,8 +79,7 @@ namespace :swaps do
           # u2_gain_type = u2_gain_type + u1.constituency.marginal_degree
         end
 
-        pairs[u1.id] = u1_type + "-SWAPPED_WITH-" + u2_type
-        pairs[u2.id] = u2_type + "-SWAPPED_WITH-" + u1_type
+        pairs[swap.id] = [u1_type, u2_type].sort.join("-SWAPPED_WITH-")
 
         voters[u1.id] = u1_type + (u1.constituency.user_is_primarily_defeater?(u1) ? "-defeater" : "")
         voters[u2.id] = u2_type + (u2.constituency.user_is_primarily_defeater?(u2) ? "-defeater" : "")
