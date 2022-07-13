@@ -30,12 +30,12 @@ class OnsConstituency < ApplicationRecord
   end
 
   def marginal_degree
-    # return ""
-    msf = polls_by_marginal_score.first.marginal_score
-    return "" if msf > 3000
-    return "-C" if msf > 2000
-    return "-B" if msf > 1000
-    return "-A"
+    return ""
+    # msf = polls_by_marginal_score.first.marginal_score
+    # return "" if msf > 3000
+    # return "-C" if msf > 2000
+    # return "-B" if msf > 1000
+    # return "-A"
   end
 
   def winner_for_user?(user)
@@ -72,6 +72,15 @@ class OnsConstituency < ApplicationRecord
     # puts user.party
     puts self.attributes
     puts polls.map(&:attributes)
+  end
+
+  def user_party_vote_share(user)
+    # raise "User does not have a preferred party" if user.preferred_party.nil?
+    # raise "constituency does not have poll predictions" unless marginal_known?
+    return 0 if user.preferred_party.nil?
+    return 0 unless marginal_known?
+    poll = polls.where(party: user.preferred_party).first
+    poll.nil? ? 0 : poll.votes
   end
 
   def constituency_type

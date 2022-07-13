@@ -50,6 +50,11 @@ namespace :swaps do
         u1_gain_type = u2.constituency.combined_type(u1)
         u2_gain_type = u1.constituency.combined_type(u2)
 
+        u1_gain = u2.constituency.user_party_vote_share(u1) - u1.constituency.user_party_vote_share(u1)
+        u2_gain = u1.constituency.user_party_vote_share(u2) - u2.constituency.user_party_vote_share(u2)
+
+        u1_gain_words = u1_gain > 0 ? "positive" : (u1_gain < 0 ? "negative" : "zero")
+        u2_gain_words = u2_gain > 0 ? "positive" : (u2_gain < 0 ? "negative" : "zero")
 
         if (u1_gain_type == 'losing-safe' && u2_gain_type == 'losing-safe')
           # puts "\nBEFORE SWAP"
@@ -70,14 +75,14 @@ namespace :swaps do
         voters[u1.id] = u1_type
         voters[u2.id] = u2_type
 
-        voter_gains[u1.id] = u1_type + "-GAINS-" + u1_gain_type
-        voter_gains[u2.id] = u2_type + "-GAINS-" + u2_gain_type
+        voter_gains[u1.id] = u1_type + "-GAINS-" + u1_gain_words
+        voter_gains[u2.id] = u2_type + "-GAINS-" + u2_gain_words
 
-        diff_gains[u1.id] = "MY-GAIN-" + u1_gain_type + "-SWAPPER-GAIN-" + u2_gain_type
-        diff_gains[u2.id] = "MY-GAIN-" + u2_gain_type + "-SWAPPER-GAIN-" + u1_gain_type
+        diff_gains[u1.id] = "MY-GAIN-" + u1_gain_words + "-SWAPPER-GAIN-" + u2_gain_words
+        diff_gains[u2.id] = "MY-GAIN-" + u2_gain_words + "-SWAPPER-GAIN-" + u1_gain_words
 
-        diff_3_gains[u1.id] = u1_type + "-MY-GAIN-" + u1_gain_type + "-SWAPPER-GAIN-" + u2_gain_type
-        diff_3_gains[u2.id] = u2_type + "-MY-GAIN-" + u2_gain_type + "-SWAPPER-GAIN-" + u1_gain_type
+        diff_3_gains[u1.id] = u1_type + "-MY-GAIN-" + u1_gain_words + "-SWAPPER-GAIN-" + u2_gain_words
+        diff_3_gains[u2.id] = u2_type + "-MY-GAIN-" + u2_gain_words + "-SWAPPER-GAIN-" + u1_gain_words
       end
 
       puts "\n\nVOTERS"
