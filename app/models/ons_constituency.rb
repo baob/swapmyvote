@@ -50,6 +50,10 @@ class OnsConstituency < ApplicationRecord
     marginal_known? && marginal? && parties_by_marginal_score[0..1].map(&:id).include?(user.preferred_party.id)
   end
 
+  def user_is_defeater?(user)
+    marginal_known? && !winner_for_user?(user) && !marginal_for_user?(user) && parties_by_marginal_score[0..1].map(&:id).include?(user.willing_party.id)
+  end
+
   def voter_type(user)
     return "wfl_unknown_" + user.preferred_party.name if !marginal_known?
     if winner_for_user?(user)
