@@ -56,6 +56,12 @@ namespace :swaps do
         u1_gain_words = u1_gain > 0 ? "positive" : (u1.constituency.user_is_defeater?(u1) ? "defeat" : "none")
         u2_gain_words = u2_gain > 0 ? "positive" : (u2.constituency.user_is_defeater?(u2) ? "defeat" : "none")
 
+        # # if (u1_type == 'fighting-marginal' && (u1.constituency.user_is_defeater?(u1))
+        #   puts "\n\nu1_type", u1_type
+        #   u1.constituency.dump_before_raise(u1)
+        #   raise "first fighting marginal defeater"
+        # # end
+
         if (u1_gain_type == 'losing-safe' && u2_gain_type == 'losing-safe')
           # puts "\nBEFORE SWAP"
           # u1.constituency.dump_before_raise(u1)
@@ -72,8 +78,8 @@ namespace :swaps do
           # u2_gain_type = u2_gain_type + u1.constituency.marginal_degree
         end
 
-        voters[u1.id] = u1_type
-        voters[u2.id] = u2_type
+        voters[u1.id] = u1_type + (u1.constituency.user_is_defeater?(u1) ? "-defeater" : "")
+        voters[u2.id] = u2_type + (u2.constituency.user_is_defeater?(u2) ? "-defeater" : "")
 
         voter_gains[u1.id] = u1_type + "-GAINS-" + u1_gain_words
         voter_gains[u2.id] = u2_type + "-GAINS-" + u2_gain_words
@@ -109,7 +115,7 @@ namespace :swaps do
 
       not_swaps.each do |user|
         unless user.constituency.nil? || user.preferred_party.nil?
-          type = user.constituency.combined_type(user)
+          type = user.constituency.combined_type(user) + (user.constituency.user_is_defeater?(user) ? "-defeater" : "")
           not_swap_result[user.id] = type
         end
       end
