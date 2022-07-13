@@ -50,8 +50,12 @@ class OnsConstituency < ApplicationRecord
     marginal_known? && marginal? && parties_by_marginal_score[0..1].map(&:id).include?(user.preferred_party_id)
   end
 
-  def user_is_defeater?(user)
-    marginal_known? && !winner_for_user?(user) && !marginal_for_user?(user) && parties_by_marginal_score[0..1].map(&:id).include?(user.willing_party_id)
+  def user_is_primarily_defeater?(user)
+    marginal_known? && !winner_for_user?(user) && !marginal_for_user?(user) && user_is_potentially_a_defeater?(user)
+  end
+
+  def user_is_potentially_a_defeater?(user)
+    marginal_known? && parties_by_marginal_score[0..1].map(&:id).include?(user.willing_party_id)
   end
 
   def voter_type(user)
@@ -73,7 +77,7 @@ class OnsConstituency < ApplicationRecord
     puts "winner_for_user?(user)", winner_for_user?(user)
     puts "loser_for_user?(user)", loser_for_user?(user)
     puts "marginal_for_user?(user)", marginal_for_user?(user)
-    puts "user_is_defeater?(user)", user_is_defeater?(user)
+    puts "user_is_primarily_defeater?(user)", user_is_primarily_defeater?(user)
     # puts user.party
     puts self.attributes
     puts polls.map(&:attributes)

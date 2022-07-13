@@ -54,10 +54,10 @@ namespace :swaps do
         u1_gain = u2.constituency.user_party_vote_share(u1) - u1.constituency.user_party_vote_share(u1)
         u2_gain = u1.constituency.user_party_vote_share(u2) - u2.constituency.user_party_vote_share(u2)
 
-        u1_gain_words = u1_gain > 0 ? "positive" : (u1.constituency.user_is_defeater?(u1) ? "defeat" : "none")
-        u2_gain_words = u2_gain > 0 ? "positive" : (u2.constituency.user_is_defeater?(u2) ? "defeat" : "none")
+        u1_gain_words = u1_gain > 0 ? "positive" : (u1.constituency.user_is_potentially_a_defeater?(u1) ? "defeat" : "none")
+        u2_gain_words = u2_gain > 0 ? "positive" : (u2.constituency.user_is_potentially_a_defeater?(u2) ? "defeat" : "none")
 
-        # # if (u1_type == 'fighting-marginal' && (u1.constituency.user_is_defeater?(u1))
+        # # if (u1_type == 'fighting-marginal' && (u1.constituency.user_is_primarily_defeater?(u1))
         #   puts "\n\nu1_type", u1_type
         #   u1.constituency.dump_before_raise(u1)
         #   raise "first fighting marginal defeater"
@@ -82,8 +82,8 @@ namespace :swaps do
         pairs[u1.id] = u1_type + "-SWAPPED_WITH-" + u2_type
         pairs[u2.id] = u2_type + "-SWAPPED_WITH-" + u1_type
 
-        voters[u1.id] = u1_type + (u1.constituency.user_is_defeater?(u1) ? "-defeater" : "")
-        voters[u2.id] = u2_type + (u2.constituency.user_is_defeater?(u2) ? "-defeater" : "")
+        voters[u1.id] = u1_type + (u1.constituency.user_is_primarily_defeater?(u1) ? "-defeater" : "")
+        voters[u2.id] = u2_type + (u2.constituency.user_is_primarily_defeater?(u2) ? "-defeater" : "")
 
         voter_gains[u1.id] = u1_type + "-GAINS-" + u1_gain_words
         voter_gains[u2.id] = u2_type + "-GAINS-" + u2_gain_words
@@ -122,7 +122,7 @@ namespace :swaps do
 
       not_swaps.each do |user|
         unless user.constituency.nil? || user.preferred_party.nil?
-          type = user.constituency.combined_type(user) + (user.constituency.user_is_defeater?(user) ? "-defeater" : "")
+          type = user.constituency.combined_type(user) + (user.constituency.user_is_primarily_defeater?(user) ? "-defeater" : "")
           not_swap_result[user.id] = type
         end
       end
