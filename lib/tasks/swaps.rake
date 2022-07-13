@@ -53,8 +53,8 @@ namespace :swaps do
         u1_gain = u2.constituency.user_party_vote_share(u1) - u1.constituency.user_party_vote_share(u1)
         u2_gain = u1.constituency.user_party_vote_share(u2) - u2.constituency.user_party_vote_share(u2)
 
-        u1_gain_words = u1_gain > 0 ? "positive" : (u1_gain < 0 ? "negative" : "zero")
-        u2_gain_words = u2_gain > 0 ? "positive" : (u2_gain < 0 ? "negative" : "zero")
+        u1_gain_words = u1_gain > 0 ? "positive" : (u1.constituency.user_is_defeater?(u1) ? "defeat" : "none")
+        u2_gain_words = u2_gain > 0 ? "positive" : (u2.constituency.user_is_defeater?(u2) ? "defeat" : "none")
 
         if (u1_gain_type == 'losing-safe' && u2_gain_type == 'losing-safe')
           # puts "\nBEFORE SWAP"
