@@ -32,7 +32,7 @@ namespace :swaps do
         d.to_a.sort{ |x,y| x.last <=> y.last }.to_h
       end
 
-      swaps = Swap.where(confirmed: true).all
+      swaps = Swap.joins(:choosing_user => :constituency, :chosen_user => :constituency).where(confirmed: true).all
 
       voters = Hash.new
       voter_gains = Hash.new
@@ -103,7 +103,7 @@ namespace :swaps do
 
       swapper_ids = voters.map{ |(id, type)| id}
 
-      not_swaps = User.where("id not in (?)", swapper_ids)
+      not_swaps = User.joins(:constituency, :preferred_party).where("users.id not in (?)", swapper_ids)
 
       not_swap_result = Hash.new
 
