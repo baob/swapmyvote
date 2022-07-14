@@ -40,4 +40,32 @@ class Poll < ApplicationRecord
       puts if progress
     end
   end
+
+
+  class Cache
+
+    # cattr_reader :polls_cache
+
+    class << self
+      @initialized = false
+
+      def initialize
+        return if @initialized
+        @@polls_cache = Hash.new
+        polls = Poll.eager_load(:constituency).limit(13_000)
+        polls.each do |poll|
+          key = { party_id: poll.party_id, constituency_ons_id: poll.constituency_ons_id }
+          # puts key
+          @@polls_cache[key] = poll
+        end
+        @initialized = true
+      end
+
+      def get(key)
+        initialize
+        # puts @@polls_cache.size
+        @@polls_cache[key]
+      end
+    end
+  end
 end
