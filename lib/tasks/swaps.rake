@@ -60,8 +60,15 @@ namespace :swaps do
         u1_gain = c2.user_party_vote_share(u1) - c1.user_party_vote_share(u1)
         u2_gain = c1.user_party_vote_share(u2) - c2.user_party_vote_share(u2)
 
-        u1_gain_words = u1_gain > 0 ? "positive" : (c1.user_is_potentially_a_defeater?(u1) ? "defeat" : "none")
-        u2_gain_words = u2_gain > 0 ? "positive" : (c2.user_is_potentially_a_defeater?(u2) ? "defeat" : "none")
+        u1_gain_list = u1_gain > 0 ? ["preferred"] :  []
+        u2_gain_list = u2_gain > 0 ? ["preferred"] :  []
+        u1_gain_list.push("willing") if u2_gain > 0
+        u2_gain_list.push("willing") if u1_gain > 0
+        u1_gain_list = (c1.user_is_potentially_a_defeater?(u1) ? ["defeater"] : ["none"]) if u1_gain_list.size == 0
+        u2_gain_list = (c2.user_is_potentially_a_defeater?(u2) ? ["defeater"] : ["none"]) if u2_gain_list.size == 0
+
+        u1_gain_words = u1_gain_list.join("-")
+        u2_gain_words = u2_gain_list.join("-")
 
         # # if (u1_type == 'fighting-marginal' && (c1.user_is_primarily_defeater?(u1))
         #   puts "\n\nu1_type", u1_type
