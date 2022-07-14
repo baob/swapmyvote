@@ -52,11 +52,13 @@ class Poll < ApplicationRecord
       def initialize
         return if @initialized
         @@polls_cache = Hash.new
+        @@constituencies_cache = Hash.new
         polls = Poll.eager_load(:constituency).limit(13_000)
         polls.each do |poll|
           key = { party_id: poll.party_id, constituency_ons_id: poll.constituency_ons_id }
           # puts key
           @@polls_cache[key] = poll
+          @@constituencies_cache[poll.constituency_ons_id] = poll.constituency
         end
         @initialized = true
       end
@@ -65,6 +67,12 @@ class Poll < ApplicationRecord
         initialize
         # puts @@polls_cache.size
         @@polls_cache[key]
+      end
+
+      def get_constituency(ons_id)
+        initialize
+        # puts @@polls_cache.size
+        @@constituencies_cache[ons_id] ||= OnsConstituency.find_by(ons_id: ons_id)
       end
     end
   end
