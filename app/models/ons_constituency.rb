@@ -40,6 +40,7 @@ class OnsConstituency < ApplicationRecord
     # return "-A"
   end
 
+
   def winner_for_user?(user)
     marginal_known? && !marginal? && polls_by_marginal_score.first.party_id == user.preferred_party_id
   end
@@ -53,11 +54,15 @@ class OnsConstituency < ApplicationRecord
   end
 
   def user_is_primarily_defeater?(user)
-    marginal_known? && !winner_for_user?(user) && !marginal_for_user?(user) && user_is_potentially_a_defeater?(user)
+    marginal_known? && !winner_for_user?(user) && !marginal_for_user?(user) && voter_may_have_defeat_strategy?(user.willing_party_id)
   end
 
-  def user_is_potentially_a_defeater?(user)
-    marginal_known? && polls_by_marginal_score[0..1].map(&:party_id).include?(user.willing_party_id)
+  def voter_may_have_defeat_strategy?(party_id)
+    marginal_known? &&
+      (
+        (marginal? && polls_by_marginal_score[0..1].map(&:party_id).include?(party_id)) ||
+        (!marginal? && polls_by_marginal_score[1].party_id == party_id)
+      )
   end
 
   def voter_type(user)
