@@ -32,6 +32,8 @@ namespace :swaps do
         d.to_a.sort{ |x,y| x.last <=> y.last }.to_h
       end
 
+      threshold_text = "Marginal Threshold: #{OnsConstituency::MARGINAL_THRESHOLD}"
+
       swaps = Swap.joins(:choosing_user => :constituency, :chosen_user => :constituency).where(confirmed: true).all
 
       voters = Hash.new
@@ -94,22 +96,22 @@ namespace :swaps do
         diff_3_gains[u2.id] = u2_type + "-MY-GAIN-" + u2_gain_words + "-SWAPPER-GAIN-" + u1_gain_words
       end
 
-      puts "\n\nVOTERS"
+      puts "\n\nVOTERS -", threshold_text
       # puts voters.map{ |(id,type)| type }.tally
       pp sort_hash_by_value(voters.map{ |(id,type)| type }.tally)
 
-      puts "\n\nVOTER PAIRS"
+      puts "\n\nVOTER PAIRS -", threshold_text
       pp sort_hash_by_value(pairs.map{ |(id,type)| type }.tally)
 
-      puts "\n\nIMMEDIATE VOTER GAINS"
+      puts "\n\nIMMEDIATE VOTER GAINS -", threshold_text
       # puts voter_gains.map{ |(id,type)| type }.tally
       pp sort_hash_by_value(voter_gains.map{ |(id,type)| type }.tally)
 
-      puts "\n\nDIFFERENTIAL GAINS"
+      puts "\n\nDIFFERENTIAL GAINS -", threshold_text
       # puts diff_gains.map{ |(id,type)| type }.tally
       pp sort_hash_by_value( diff_gains.map{ |(id,type)| type }.tally )
 
-      puts "\n\n3-WAY DIFFERENTIAL GAINS"
+      puts "\n\n3-WAY DIFFERENTIAL GAINS -", threshold_text
       # puts diff_3_gains.map{ |(id,type)| type }.tally
       pp sort_hash_by_value(diff_3_gains.map{ |(id,type)| type }.tally)
 
@@ -126,7 +128,7 @@ namespace :swaps do
         end
       end
 
-      puts "\n\nUSERS WHO DIDN'T SWAP"
+      puts "\n\nUSERS WHO DIDN'T SWAP -", threshold_text
       # puts not_swap_result.map{ |(id,type)| type }.tally
       pp sort_hash_by_value(not_swap_result.map{ |(id,type)| type }.tally)
 
