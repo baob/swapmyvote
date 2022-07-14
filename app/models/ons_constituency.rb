@@ -16,7 +16,7 @@ class OnsConstituency < ApplicationRecord
 
   def polls_by_marginal_score
     return @polls_by_marginal_score if defined? @polls_by_marginal_score
-    @polls_by_marginal_score = polls.order(:marginal_score)
+    @polls_by_marginal_score = polls.order(:marginal_score).all
   end
 
   MARGINAL_THRESHOLD = 2000
@@ -41,7 +41,7 @@ class OnsConstituency < ApplicationRecord
   end
 
   def winner_for_user?(user)
-    marginal_known? && !marginal? && parties_by_marginal_score.first.id == user.preferred_party_id
+    marginal_known? && !marginal? && polls_by_marginal_score.first.party_id == user.preferred_party_id
   end
 
   def loser_for_user?(user)
@@ -49,7 +49,7 @@ class OnsConstituency < ApplicationRecord
   end
 
   def marginal_for_user?(user)
-    marginal_known? && marginal? && parties_by_marginal_score[0..1].map(&:id).include?(user.preferred_party_id)
+    marginal_known? && marginal? && polls_by_marginal_score[0..1].map(&:party_id).include?(user.preferred_party_id)
   end
 
   def user_is_primarily_defeater?(user)
@@ -57,7 +57,7 @@ class OnsConstituency < ApplicationRecord
   end
 
   def user_is_potentially_a_defeater?(user)
-    marginal_known? && parties_by_marginal_score[0..1].map(&:id).include?(user.willing_party_id)
+    marginal_known? && polls_by_marginal_score[0..1].map(&:party_id).include?(user.willing_party_id)
   end
 
   def voter_type(user)
