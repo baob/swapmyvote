@@ -127,7 +127,7 @@ namespace :swaps do
 
       not_swaps.each do |user|
         c1 = Poll::Cache.get_constituency(user.constituency_ons_id)
-        unless c1.nil? || user.preferred_party.nil?
+        unless c1.nil? || user.preferred_party_id.nil?
           type = c1.combined_type(user) + (c1.user_is_primarily_defeater?(user) ? "-defeater" : "")
           not_swap_result[user.id] = type
         end
