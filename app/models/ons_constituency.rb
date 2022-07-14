@@ -90,7 +90,8 @@ class OnsConstituency < ApplicationRecord
     # raise "constituency does not have poll predictions" unless marginal_known?
     return 0 if user.preferred_party_id.nil?
     return 0 unless marginal_known?
-    poll = polls.where(party_id: user.preferred_party_id).first
+    # poll = polls.where(party_id: user.preferred_party_id).first
+    poll = Poll::Cache.get(party_id: user.preferred_party_id, constituency_ons_id: ons_id)
     poll.nil? ? 0 : poll.votes
   end
 
