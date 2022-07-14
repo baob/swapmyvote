@@ -88,9 +88,9 @@ class OnsConstituency < ApplicationRecord
   def user_party_vote_share(user)
     # raise "User does not have a preferred party" if user.preferred_party.nil?
     # raise "constituency does not have poll predictions" unless marginal_known?
-    return 0 if user.preferred_party.nil?
+    return 0 if user.preferred_party_id.nil?
     return 0 unless marginal_known?
-    poll = polls.where(party: user.preferred_party).first
+    poll = polls.where(party_id: user.preferred_party_id).first
     poll.nil? ? 0 : poll.votes
   end
 
