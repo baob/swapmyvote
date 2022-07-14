@@ -74,8 +74,7 @@ namespace :swaps do
         voter_gains[u1.id] = u1_type + "-GAINS-" + u1_gain_words
         voter_gains[u2.id] = u2_type + "-GAINS-" + u2_gain_words
 
-        diff_gains[u1.id] = "MY-GAIN-" + u1_gain_words + "-SWAPPER-GAIN-" + u2_gain_words
-        diff_gains[u2.id] = "MY-GAIN-" + u2_gain_words + "-SWAPPER-GAIN-" + u1_gain_words
+        diff_gains[swap.id] = [u1_gain_words, u2_gain_words].sort.join("-OTHER-GAIN-")
 
         diff_3_gains[u1.id] = u1_type + "-MY-GAIN-" + u1_gain_words + "-SWAPPER-GAIN-" + u2_gain_words
         diff_3_gains[u2.id] = u2_type + "-MY-GAIN-" + u2_gain_words + "-SWAPPER-GAIN-" + u1_gain_words
