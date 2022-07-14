@@ -34,7 +34,7 @@ namespace :swaps do
 
       threshold_text = "Marginal Threshold: #{OnsConstituency::MARGINAL_THRESHOLD}"
 
-      swaps = Swap.joins(:choosing_user => :constituency, :chosen_user => :constituency).where(confirmed: true).all
+      swaps = Swap.joins(:choosing_user => :constituency, :chosen_user => :constituency).eager_load(:chosen_user, :choosing_user).where(confirmed: true).all
 
       voters = Hash.new
       voter_gains = Hash.new
