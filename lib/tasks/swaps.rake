@@ -60,8 +60,14 @@ namespace :swaps do
         u2_gain_list = u2_gain > 0 ? ["preferred"] :  []
         u1_gain_list.push("willing") if u2_gain > 0
         u2_gain_list.push("willing") if u1_gain > 0
-        u1_gain_list = (c1.voter_may_have_defeat_strategy?(u1.willing_party_id) ? ["defeater"] : ["none"]) if u1_gain_list.size == 0
-        u2_gain_list = (c2.voter_may_have_defeat_strategy?(u2.willing_party_id) ? ["defeater"] : ["none"]) if u2_gain_list.size == 0
+
+        u1_may_be_a_defeater = c1.voter_may_have_defeat_strategy?(u1.willing_party_id) ||
+                               c2.voter_may_have_defeat_strategy?(u1.preferred_party_id)
+        u2_may_be_a_defeater = c2.voter_may_have_defeat_strategy?(u2.willing_party_id) ||
+                               c1.voter_may_have_defeat_strategy?(u2.preferred_party_id)
+
+        u1_gain_list = u1_may_be_a_defeater ? ["defeat"] : ["none"] if u1_gain_list.size == 0
+        u2_gain_list = u2_may_be_a_defeater ? ["defeat"] : ["none"] if u2_gain_list.size == 0
 
         u1_gain_words = u1_gain_list.join("-")
         u2_gain_words = u2_gain_list.join("-")
