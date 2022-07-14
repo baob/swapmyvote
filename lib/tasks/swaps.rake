@@ -50,12 +50,8 @@ namespace :swaps do
         c1 = Poll::Cache.get_constituency(u1.constituency_ons_id)
         c2 = Poll::Cache.get_constituency(u2.constituency_ons_id)
 
-
         u1_type = c1.combined_type(u1)
         u2_type = c2.combined_type(u2)
-
-        u1_gain_type = c2.combined_type(u1)
-        u2_gain_type = c1.combined_type(u2)
 
         u1_gain = c2.user_party_vote_share(u1) - c1.user_party_vote_share(u1)
         u2_gain = c1.user_party_vote_share(u2) - c2.user_party_vote_share(u2)
@@ -69,28 +65,6 @@ namespace :swaps do
 
         u1_gain_words = u1_gain_list.join("-")
         u2_gain_words = u2_gain_list.join("-")
-
-        # # if (u1_type == 'fighting-marginal' && (c1.user_is_primarily_defeater?(u1))
-        #   puts "\n\nu1_type", u1_type
-        #   c1.dump_before_raise(u1)
-        #   raise "first fighting marginal defeater"
-        # # end
-
-        if (u1_gain_type == 'losing-safe' && u2_gain_type == 'losing-safe')
-          # puts "\nBEFORE SWAP"
-          # c1.dump_before_raise(u1)
-          # c2.dump_before_raise(u2)
-          # puts "\nAFTER SWAP"
-          # c1.dump_before_raise(u2)
-          # c2.dump_before_raise(u1)
-          # raise "first double loosing safe"
-
-          # u1_type = u1_type + c1.marginal_degree
-          # u2_type = u2_type + c2.marginal_degree
-
-          # u1_gain_type = u1_gain_type + c2.marginal_degree
-          # u2_gain_type = u2_gain_type + c1.marginal_degree
-        end
 
         pairs[swap.id] = [u1_type, u2_type].sort.join("-SWAPPED_WITH-")
 
@@ -108,22 +82,18 @@ namespace :swaps do
       end
 
       puts "\n\nVOTERS -", threshold_text
-      # puts voters.map{ |(id,type)| type }.tally
       pp sort_hash_by_value(voters.map{ |(id,type)| type }.tally)
 
       puts "\n\nVOTER PAIRS -", threshold_text
       pp sort_hash_by_value(pairs.map{ |(id,type)| type }.tally)
 
       puts "\n\nIMMEDIATE VOTER GAINS -", threshold_text
-      # puts voter_gains.map{ |(id,type)| type }.tally
       pp sort_hash_by_value(voter_gains.map{ |(id,type)| type }.tally)
 
       puts "\n\nDIFFERENTIAL GAINS -", threshold_text
-      # puts diff_gains.map{ |(id,type)| type }.tally
       pp sort_hash_by_value( diff_gains.map{ |(id,type)| type }.tally )
 
       puts "\n\n3-WAY DIFFERENTIAL GAINS -", threshold_text
-      # puts diff_3_gains.map{ |(id,type)| type }.tally
       pp sort_hash_by_value(diff_3_gains.map{ |(id,type)| type }.tally)
 
       swapper_ids = voters.map{ |(id, type)| id}
@@ -141,9 +111,7 @@ namespace :swaps do
       end
 
       puts "\n\nUSERS WHO DIDN'T SWAP -", threshold_text
-      # puts not_swap_result.map{ |(id,type)| type }.tally
       pp sort_hash_by_value(not_swap_result.map{ |(id,type)| type }.tally)
-
 
     end
   end
