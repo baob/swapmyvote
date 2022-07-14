@@ -22,11 +22,13 @@ class OnsConstituency < ApplicationRecord
   MARGINAL_THRESHOLD = 2000
 
   def marginal?
-    polls_by_marginal_score.first.marginal_score <= MARGINAL_THRESHOLD
+    return @is_marginal if defined?(@is_marginal)
+    @is_marginal = polls_by_marginal_score.first.marginal_score <= MARGINAL_THRESHOLD
   end
 
   def marginal_known?
-    polls_by_marginal_score.count > 0
+    return @marginal_known if defined?(@marginal_known)
+    @marginal_known = polls_by_marginal_score.count > 0
   end
 
   def marginal_degree
