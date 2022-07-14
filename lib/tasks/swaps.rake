@@ -47,44 +47,48 @@ namespace :swaps do
         u1 = swap.choosing_user
         u2 = swap.chosen_user
 
-        u1_type = u1.constituency.combined_type(u1)
-        u2_type = u2.constituency.combined_type(u2)
+        c1 = Poll::Cache.get_constituency(u1.constituency_ons_id)
+        c2 = Poll::Cache.get_constituency(u2.constituency_ons_id)
 
-        u1_gain_type = u2.constituency.combined_type(u1)
-        u2_gain_type = u1.constituency.combined_type(u2)
 
-        u1_gain = u2.constituency.user_party_vote_share(u1) - u1.constituency.user_party_vote_share(u1)
-        u2_gain = u1.constituency.user_party_vote_share(u2) - u2.constituency.user_party_vote_share(u2)
+        u1_type = c1.combined_type(u1)
+        u2_type = c2.combined_type(u2)
 
-        u1_gain_words = u1_gain > 0 ? "positive" : (u1.constituency.user_is_potentially_a_defeater?(u1) ? "defeat" : "none")
-        u2_gain_words = u2_gain > 0 ? "positive" : (u2.constituency.user_is_potentially_a_defeater?(u2) ? "defeat" : "none")
+        u1_gain_type = c2.combined_type(u1)
+        u2_gain_type = c1.combined_type(u2)
 
-        # # if (u1_type == 'fighting-marginal' && (u1.constituency.user_is_primarily_defeater?(u1))
+        u1_gain = c2.user_party_vote_share(u1) - c1.user_party_vote_share(u1)
+        u2_gain = c1.user_party_vote_share(u2) - c2.user_party_vote_share(u2)
+
+        u1_gain_words = u1_gain > 0 ? "positive" : (c1.user_is_potentially_a_defeater?(u1) ? "defeat" : "none")
+        u2_gain_words = u2_gain > 0 ? "positive" : (c2.user_is_potentially_a_defeater?(u2) ? "defeat" : "none")
+
+        # # if (u1_type == 'fighting-marginal' && (c1.user_is_primarily_defeater?(u1))
         #   puts "\n\nu1_type", u1_type
-        #   u1.constituency.dump_before_raise(u1)
+        #   c1.dump_before_raise(u1)
         #   raise "first fighting marginal defeater"
         # # end
 
         if (u1_gain_type == 'losing-safe' && u2_gain_type == 'losing-safe')
           # puts "\nBEFORE SWAP"
-          # u1.constituency.dump_before_raise(u1)
-          # u2.constituency.dump_before_raise(u2)
+          # c1.dump_before_raise(u1)
+          # c2.dump_before_raise(u2)
           # puts "\nAFTER SWAP"
-          # u1.constituency.dump_before_raise(u2)
-          # u2.constituency.dump_before_raise(u1)
+          # c1.dump_before_raise(u2)
+          # c2.dump_before_raise(u1)
           # raise "first double loosing safe"
 
-          # u1_type = u1_type + u1.constituency.marginal_degree
-          # u2_type = u2_type + u2.constituency.marginal_degree
+          # u1_type = u1_type + c1.marginal_degree
+          # u2_type = u2_type + c2.marginal_degree
 
-          # u1_gain_type = u1_gain_type + u2.constituency.marginal_degree
-          # u2_gain_type = u2_gain_type + u1.constituency.marginal_degree
+          # u1_gain_type = u1_gain_type + c2.marginal_degree
+          # u2_gain_type = u2_gain_type + c1.marginal_degree
         end
 
         pairs[swap.id] = [u1_type, u2_type].sort.join("-SWAPPED_WITH-")
 
-        voters[u1.id] = u1_type + (u1.constituency.user_is_primarily_defeater?(u1) ? "-defeater" : "")
-        voters[u2.id] = u2_type + (u2.constituency.user_is_primarily_defeater?(u2) ? "-defeater" : "")
+        voters[u1.id] = u1_type + (c1.user_is_primarily_defeater?(u1) ? "-defeater" : "")
+        voters[u2.id] = u2_type + (c2.user_is_primarily_defeater?(u2) ? "-defeater" : "")
 
         voter_gains[u1.id] = u1_type + "-GAINS-" + u1_gain_words
         voter_gains[u2.id] = u2_type + "-GAINS-" + u2_gain_words
@@ -122,8 +126,9 @@ namespace :swaps do
       not_swap_result = Hash.new
 
       not_swaps.each do |user|
-        unless user.constituency.nil? || user.preferred_party.nil?
-          type = user.constituency.combined_type(user) + (user.constituency.user_is_primarily_defeater?(user) ? "-defeater" : "")
+        c1 = Poll::Cache.get_constituency(user.constituency_ons_id)
+        unless c1.nil? || user.preferred_party.nil?
+          type = c1.combined_type(user) + (c1.user_is_primarily_defeater?(user) ? "-defeater" : "")
           not_swap_result[user.id] = type
         end
       end
