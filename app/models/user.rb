@@ -108,6 +108,26 @@ class User < ApplicationRecord
     end
   end
 
+  def assess_swaps(gain_offset = 1000)
+    u1 = self
+
+    scores = potential_swaps.reload.eager_load(:target_user).map do |swap|
+      this_score = 0
+      u2 = swap.target_user
+
+      u1_c1_poll = Poll::Cache.get( {constituency_ons_id: u1.constituency_ons_id, party_id: u1.preferred_party_id} )
+      u1_c2_poll = Poll::Cache.get( {constituency_ons_id: u2.constituency_ons_id, party_id: u1.preferred_party_id} )
+      u2_c1_poll = Poll::Cache.get( {constituency_ons_id: u1.constituency_ons_id, party_id: u2.preferred_party_id} )
+      u2_c2_poll = Poll::Cache.get( {constituency_ons_id: u2.constituency_ons_id, party_id: u2.preferred_party_id} )
+
+      this_score += 1 if (u1_c2_poll&.votes || 0) > (u1_c1_poll&.votes || 0) + gain_offset
+      this_score += 1 if (u2_c1_poll&.votes || 0) > (u2_c2_poll&.votes || 0) + gain_offset
+      this_score
+    end
+
+    return scores.size == 0 ? 0 : Float(scores.sum)/scores.size
+  end
+
   def try_to_create_potential_swap
     swaps = complementary_voters.where("constituency_ons_id like '_%'")
     return one_swap_from_possible_users(swaps)
