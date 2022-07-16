@@ -110,14 +110,26 @@ class User < ApplicationRecord
 
   def assess_swaps(gain_offset = 1000)
     scores = potential_swaps.eager_load(:target_user).map do |swap|
-      other_user = swap.target_user
-      this_score = 0
-      this_score += 1 if gain_from_swap_with(other_user) > gain_offset
-      this_score += 1 if other_user.gain_from_swap_with(self) > gain_offset
-      this_score
+      assess_whole_swap_with(swap.target_user, gain_offset)
     end
 
     return scores.size == 0 ? 0 : Float(scores.sum)/scores.size
+  end
+
+  # experimental metric for a good swap
+  def score_whole_swap_with(other_user, gain_offset = 1000)
+    assess = assess_whole_swap_with(other_user, gain_offset) # 0, 1, or 2 - how many of us gain
+    return assess < 2 ?
+      0
+      # [gain_from_swap_with(other_user), other_user.gain_from_swap_with(self)].max
+      : gain_from_swap_with(other_user) + other_user.gain_from_swap_with(self) - 2 * gain_offset
+  end
+
+  def assess_whole_swap_with(other_user, gain_offset)
+    this_score = 0
+    this_score += 1 if gain_from_swap_with(other_user) > gain_offset
+    this_score += 1 if other_user.gain_from_swap_with(self) > gain_offset
+    this_score
   end
 
   def gain_from_swap_with(other_user)
