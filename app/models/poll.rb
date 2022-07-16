@@ -41,7 +41,11 @@ class Poll < ApplicationRecord
     end
   end
 
-
+  def effort_to_win
+    return @effort_to_win if defined?(@effort_to_win)
+    winner_votes = constituency.polls.map(&:votes).max
+    @effort_to_win = ((winner_votes - votes)/2.0).ceil
+  end
   class Cache
 
     # cattr_reader :polls_cache
