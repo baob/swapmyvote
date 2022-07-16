@@ -53,8 +53,8 @@ namespace :swaps do
         u1_type = c1.combined_type(u1)
         u2_type = c2.combined_type(u2)
 
-        u1_gain = c2.user_party_vote_share(u1) - c1.user_party_vote_share(u1)
-        u2_gain = c1.user_party_vote_share(u2) - c2.user_party_vote_share(u2)
+        u1_gain = u1.vote_share_gain_from_swap_with(u2)
+        u2_gain = u2.vote_share_gain_from_swap_with(u1)
 
         u1_gain_list = u1_gain > 0 ? ["preferred"] :  []
         u2_gain_list = u2_gain > 0 ? ["preferred"] :  []
