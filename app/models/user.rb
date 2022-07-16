@@ -119,16 +119,19 @@ class User < ApplicationRecord
   # experimental metric for a good swap
   def score_whole_swap_with(other_user, gain_offset = 1000)
     assess = assess_whole_swap_with(other_user, gain_offset) # 0, 1, or 2 - how many of us gain
-    return assess < 2 ?
-      0
-      # [vote_share_gain_from_swap_with(other_user), other_user.vote_share_gain_from_swap_with(self)].max
-      : vote_share_gain_from_swap_with(other_user) + other_user.vote_share_gain_from_swap_with(self) - 2 * gain_offset
+    return assess
+    # return assess < 2 ?
+    #   0
+    #   # [vote_share_gain_from_swap_with(other_user), other_user.vote_share_gain_from_swap_with(self)].max
+    #   : assess * (vote_share_gain_from_swap_with(other_user) + other_user.vote_share_gain_from_swap_with(self) - 2 * gain_offset)
   end
 
   def assess_whole_swap_with(other_user, gain_offset)
     this_score = 0
     this_score += 1 if vote_share_gain_from_swap_with(other_user) > gain_offset
     this_score += 1 if other_user.vote_share_gain_from_swap_with(self) > gain_offset
+    this_score += 1 if effort_reduction_from_swap_with(other_user) > 0
+    this_score += 1 if other_user.effort_reduction_from_swap_with(self) > 0
     this_score
   end
 
@@ -140,6 +143,16 @@ class User < ApplicationRecord
     u1_c2_poll = Poll::Cache.get( {constituency_ons_id: u2.constituency_ons_id, party_id: u1.preferred_party_id} )
 
     (u1_c2_poll&.votes || 0) - (u1_c1_poll&.votes || 0)
+  end
+
+  def effort_reduction_from_swap_with(other_user)
+    u1 = self
+    u2 = other_user
+
+    u1_c1_poll = Poll::Cache.get( {constituency_ons_id: u1.constituency_ons_id, party_id: u1.preferred_party_id} )
+    u1_c2_poll = Poll::Cache.get( {constituency_ons_id: u2.constituency_ons_id, party_id: u1.preferred_party_id} )
+
+    effort_reduction = (u1_c2_poll&.votes.nil? || u1_c1_poll&.votes.nil?) ? 0 : u1_c1_poll.effort_to_win - u1_c2_poll.effort_to_win
   end
 
   def try_to_create_potential_swap
