@@ -111,7 +111,7 @@ class User < ApplicationRecord
   def assess_swaps(gain_offset = 1000)
     u1 = self
 
-    scores = potential_swaps.reload.eager_load(:target_user).map do |swap|
+    scores = potential_swaps.eager_load(:target_user).map do |swap|
       this_score = 0
       u2 = swap.target_user
 
