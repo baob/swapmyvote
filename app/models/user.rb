@@ -119,11 +119,11 @@ class User < ApplicationRecord
   # experimental metric for a good swap
   def score_whole_swap_with(other_user, gain_offset = 1000)
     assess = assess_whole_swap_with(other_user, gain_offset) # 0, 1, or 2 - how many of us gain
-    return assess
-    # return assess < 2 ?
-    #   0
-    #   # [vote_share_gain_from_swap_with(other_user), other_user.vote_share_gain_from_swap_with(self)].max
-    #   : assess * (vote_share_gain_from_swap_with(other_user) + other_user.vote_share_gain_from_swap_with(self) - 2 * gain_offset)
+    # return assess
+    return assess < 4 ?
+      0
+      # [vote_share_gain_from_swap_with(other_user), other_user.vote_share_gain_from_swap_with(self)].max
+      : effort_reduction_from_swap_with(other_user) + other_user.effort_reduction_from_swap_with(self)
   end
 
   def assess_whole_swap_with(other_user, gain_offset)
