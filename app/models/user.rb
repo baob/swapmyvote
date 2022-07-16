@@ -121,18 +121,18 @@ class User < ApplicationRecord
     assess = assess_whole_swap_with(other_user, gain_offset) # 0, 1, or 2 - how many of us gain
     return assess < 2 ?
       0
-      # [gain_from_swap_with(other_user), other_user.gain_from_swap_with(self)].max
-      : gain_from_swap_with(other_user) + other_user.gain_from_swap_with(self) - 2 * gain_offset
+      # [vote_share_gain_from_swap_with(other_user), other_user.vote_share_gain_from_swap_with(self)].max
+      : vote_share_gain_from_swap_with(other_user) + other_user.vote_share_gain_from_swap_with(self) - 2 * gain_offset
   end
 
   def assess_whole_swap_with(other_user, gain_offset)
     this_score = 0
-    this_score += 1 if gain_from_swap_with(other_user) > gain_offset
-    this_score += 1 if other_user.gain_from_swap_with(self) > gain_offset
+    this_score += 1 if vote_share_gain_from_swap_with(other_user) > gain_offset
+    this_score += 1 if other_user.vote_share_gain_from_swap_with(self) > gain_offset
     this_score
   end
 
-  def gain_from_swap_with(other_user)
+  def vote_share_gain_from_swap_with(other_user)
     u1 = self
     u2 = other_user
 
