@@ -34,7 +34,7 @@ namespace :swaps do
           poll1 = Poll::Cache.get(constituency_ons_id: constituency_ons_id, party_id: preferred_party_id)
           poll2 = Poll::Cache.get(constituency_ons_id: ons_id, party_id: preferred_party_id)
 
-          effort_reduction = (poll1&.votes.nil? || poll2&.votes.nil?) ? 0 : poll1.effort_to_win - poll2.effort_to_win
+          effort_reduction = (poll1&.votes.nil? || poll2&.votes.nil?) ? -9999 : poll1.effort_to_win - poll2.effort_to_win
           # puts "effort_reduction calc: #{[poll1&.votes.nil?, poll2&.votes.nil?, poll2&.effort_to_win, poll1&.effort_to_win ]}"
           r = (effort_reduction/1000.0).floor
           # puts "score_against: #{r}"
@@ -121,7 +121,7 @@ namespace :swaps do
       puts "\n\npercentage splits for potential swaps with various scores (score => %, score of 1 is average)"
       # pp p_swap_scores.tally.sort.to_h
       pp p_swap_scores.tally.sort.map{ |k,v| [k, (v*100.0/p_swap_scores.size).round(1)]}.to_h ; nil
-
+      puts "percentage of potential swaps evaluated #{(p_swap_scores.size*100.0/all_p_swaps.size).round(1)}"
     end
 
     desc "breakdown the swaps"
