@@ -29,6 +29,16 @@ namespace :swaps do
     desc "expermient with metrics - classify swaps into buckets"
     task metrics: :environment do
 
+      class User
+        def score_against(ons_id)
+          poll1 = Poll::Cache.get(constituency_ons_id: constituency_ons_id, party_id: preferred_party_id)
+          poll2 = Poll::Cache.get(constituency_ons_id: ons_id, party_id: preferred_party_id)
+
+          effort_reduction = (poll1&.votes.nil? || poll2&.votes.nil?) ? 0 : poll2.effort_to_win - poll1.effort_to_win
+          (effort_reduction/1000.0).floor
+        end
+      end
+
       choosing  = User.left_joins(:outgoing_swap).where("swaps.id IS NOT ?", nil).where("users.constituency_ons_id LIKE '_%'").eager_load(outgoing_swap: :chosen_user)
       expected_good_bad_ratio = choosing.where("swaps.confirmed = ?", true).count/Float(choosing.where("swaps.confirmed = ?", false).count)
 
@@ -42,24 +52,32 @@ namespace :swaps do
       puts "\n\nsparse map"
       pp lookup ; nil
 
-      filled_map = Hash.new
-      # diagonal_map = Hash.new { |o,k|  o[k] = []}
-      (-2..3).map do |x|
-        (-2..3).map do |y|
-          key = [x,y].sort
-          filled_map[[x, y]] = lookup[key]
-          # diagonal_map[x+y].push(lookup[key])
-        end
-      end
+      # filled_map = Hash.new
+      # (-2..3).map do |x|
+      #   (-2..3).map do |y|
+      #     key = [x,y].sort
+      #     filled_map[[x, y]] = lookup[key]
+      #   end
+      # end
 
       all_scores = lookup.map{ |k,v| v }
       average = all_scores.sum/Float(all_scores.size)
 
       puts "average = ", average
 
-      puts "\n\nfilled_map"
-      pp filled_map ; nil
-      # pp "\n\ndiagonal_map", diagonal_map ; nil
+      # puts "\n\nfilled_map"
+      # pp filled_map ; nil
+
+      all_p_swaps = PotentialSwap.eager_load(:source_user => :constituency, :target_user => :constituency) # .limit(50)
+      p_swap_scores = all_p_swaps.map do |ps|
+        k1 = ps.source_user.score_against(ps.target_user.constituency_ons_id)
+        k2 = ps.target_user.score_against(ps.source_user.constituency_ons_id)
+        # puts "k1, k2", [k1, k2]
+        score = (lookup[ [k1,k2].sort ])
+      end.compact.map{ |x| x.round(2)}
+
+      puts "\n\npercentage splits for potential swaps with various scores (score => %, score of 1 is average)"
+      pp p_swap_scores.tally.sort.map{ |k,v| [k, (v*100.0/p_swap_scores.size).round(1)]}.to_h ; nil
 
     end
 
