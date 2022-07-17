@@ -35,19 +35,38 @@ namespace :swaps do
           poll2 = Poll::Cache.get(constituency_ons_id: ons_id, party_id: preferred_party_id)
 
           effort_reduction = (poll1&.votes.nil? || poll2&.votes.nil?) ? 0 : poll2.effort_to_win - poll1.effort_to_win
-          (effort_reduction/1000.0).floor
+          # puts "effort_reduction calc: #{[poll1&.votes.nil?, poll2&.votes.nil?, poll2&.effort_to_win, poll1&.effort_to_win ]}"
+          r = (effort_reduction/1000.0).floor
+          # puts "score_against: #{r}"
+          r
         end
+
+        def bucket_with(ons_id)
+          score = score_against(ons_id)
+          marginal = Poll::Cache.get(constituency_ons_id: ons_id, party_id: preferred_party_id)&.marginal_for_party? || false
+          r = [score, marginal]
+          # puts "bucket_with: #{r}"
+          r
+        end
+      end
+
+      def order_keys_for_uniqueness(k1, k2)
+        r = k1.hash > k2.hash ? [k1, k2] : [k2, k1]
+        # puts "order_keys_for_uniqueness: #{r}"
+        # raise "blurgh" if  r.first.first == -3
+        r
       end
 
       choosing  = User.left_joins(:outgoing_swap).where("swaps.id IS NOT ?", nil).where("users.constituency_ons_id LIKE '_%'").eager_load(outgoing_swap: :chosen_user)
       expected_good_bad_ratio = choosing.where("swaps.confirmed = ?", true).count/Float(choosing.where("swaps.confirmed = ?", false).count)
 
-      threeway = choosing.map{ |c| o = c.outgoing_swap.chosen_user; [(c.effort_reduction_from_swap_with(o)/1000.0).floor, (o.effort_reduction_from_swap_with(c)/1000.0).floor, c.outgoing_swap.confirmed] }.tally
+      threeway = choosing.map{ |c| o = c.outgoing_swap.chosen_user; [c.bucket_with(o.constituency_ons_id), o.bucket_with(c.constituency_ons_id), c.outgoing_swap.confirmed] }.tally
 
       result = Hash.new{ |o,k| o[k] = Hash.new { |o,k| o[k] = 0 } }
-      twoway = threeway.each_with_object(result) { |(k,v), r| new_k = [k[0], k[1]].sort ;  new_sub_k = k[2] ; r[new_k][new_sub_k] = v  }
+      # puts "(k,v), r: #{[k,v,r]}" ;
+      twoway = threeway.each_with_object(result) { |(k,v), r|  new_k = order_keys_for_uniqueness(k[0], k[1]) ;  new_sub_k = k[2] ; r[new_k][new_sub_k] = v  }
 
-      lookup = twoway.select{ |o| twoway[o].size == 2 && twoway[o][false] > 1}.map{  |(pair, value)| [pair, value[true]/Float(expected_good_bad_ratio * value[false])] }.sort.to_h
+      lookup = twoway.select{ |o| twoway[o].size == 2 && twoway[o][false] > 1}.map{  |(pair, value)| [pair, value[true]/Float(expected_good_bad_ratio * value[false])] }.sort{ |(a,_),(b, _)| a.first.first*1000 +  a.last.first <=> b.first.first*1000 +  b.last.first  }.to_h
 
       puts "\n\nsparse map"
       pp lookup ; nil
@@ -70,13 +89,14 @@ namespace :swaps do
 
       all_p_swaps = PotentialSwap.eager_load(:source_user => :constituency, :target_user => :constituency) # .limit(50)
       p_swap_scores = all_p_swaps.map do |ps|
-        k1 = ps.source_user.score_against(ps.target_user.constituency_ons_id)
-        k2 = ps.target_user.score_against(ps.source_user.constituency_ons_id)
-        # puts "k1, k2", [k1, k2]
-        score = (lookup[ [k1,k2].sort ])
+        k1 = ps.source_user.bucket_with(ps.target_user.constituency_ons_id)
+        k2 = ps.target_user.bucket_with(ps.source_user.constituency_ons_id)
+        # puts "k1, k2", [k1, k2].inspect
+        score = (lookup[ order_keys_for_uniqueness(k1,k2) ])
       end.compact.map{ |x| x.round(2)}
 
       puts "\n\npercentage splits for potential swaps with various scores (score => %, score of 1 is average)"
+      # pp p_swap_scores.tally.sort.to_h
       pp p_swap_scores.tally.sort.map{ |k,v| [k, (v*100.0/p_swap_scores.size).round(1)]}.to_h ; nil
 
     end

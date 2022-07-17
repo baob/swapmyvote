@@ -41,10 +41,19 @@ class Poll < ApplicationRecord
     end
   end
 
+  def all_polls
+    return @all_polls if defined?(@all_polls)
+    @all_polls = constituency.polls
+  end
+
   def effort_to_win
     return @effort_to_win if defined?(@effort_to_win)
-    winner_votes = constituency.polls.map(&:votes).max
+    winner_votes = all_polls.map(&:votes).max
     @effort_to_win = ((winner_votes - votes)/2.0).ceil
+  end
+
+  def marginal_for_party?
+    votes <= OnsConstituency::MARGINAL_THRESHOLD
   end
   class Cache
 
