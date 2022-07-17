@@ -37,7 +37,7 @@ namespace :swaps do
       result = Hash.new{ |o,k| o[k] = Hash.new { |o,k| o[k] = 0 } }
       twoway = threeway.each_with_object(result) { |(k,v), r| new_k = [k[0], k[1]].sort ;  new_sub_k = k[2] ; r[new_k][new_sub_k] = v  }
 
-      lookup = twoway.select{ |o| twoway[o].size == 2 && twoway[o][false] > 0}.map{  |(pair, value)| [pair, value[true]/Float(expected_good_bad_ratio * value[false])] }.sort.to_h
+      lookup = twoway.select{ |o| twoway[o].size == 2 && twoway[o][false] > 1}.map{  |(pair, value)| [pair, value[true]/Float(expected_good_bad_ratio * value[false])] }.sort.to_h
 
       puts "\n\nsparse map"
       pp lookup ; nil
@@ -51,6 +51,11 @@ namespace :swaps do
           # diagonal_map[x+y].push(lookup[key])
         end
       end
+
+      all_scores = lookup.map{ |k,v| v }
+      average = all_scores.sum/Float(all_scores.size)
+
+      puts "average = ", average
 
       puts "\n\nfilled_map"
       pp filled_map ; nil
