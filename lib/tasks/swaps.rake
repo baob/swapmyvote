@@ -34,7 +34,7 @@ namespace :swaps do
           poll1 = Poll::Cache.get(constituency_ons_id: constituency_ons_id, party_id: preferred_party_id)
           poll2 = Poll::Cache.get(constituency_ons_id: ons_id, party_id: preferred_party_id)
 
-          effort_reduction = (poll1&.votes.nil? || poll2&.votes.nil?) ? 0 : poll2.effort_to_win - poll1.effort_to_win
+          effort_reduction = (poll1&.votes.nil? || poll2&.votes.nil?) ? 0 : poll1.effort_to_win - poll2.effort_to_win
           # puts "effort_reduction calc: #{[poll1&.votes.nil?, poll2&.votes.nil?, poll2&.effort_to_win, poll1&.effort_to_win ]}"
           r = (effort_reduction/1000.0).floor
           # puts "score_against: #{r}"
@@ -43,8 +43,8 @@ namespace :swaps do
 
         def bucket_with(ons_id)
           score = score_against(ons_id)
-          marginal = Poll::Cache.get(constituency_ons_id: ons_id, party_id: preferred_party_id)&.marginal_for_party? || false
-          r = [score, marginal]
+          mfp = Poll::Cache.get(constituency_ons_id: ons_id, party_id: preferred_party_id)&.marginal_for_party? || false
+          r = [score, mfp]
           # puts "bucket_with: #{r}"
           r
         end
@@ -59,6 +59,29 @@ namespace :swaps do
 
       choosing  = User.left_joins(:outgoing_swap).where("swaps.id IS NOT ?", nil).where("users.constituency_ons_id LIKE '_%'").eager_load(outgoing_swap: :chosen_user)
       expected_good_bad_ratio = choosing.where("swaps.confirmed = ?", true).count/Float(choosing.where("swaps.confirmed = ?", false).count)
+
+
+      # bad = choosing.select { |c| o = c.outgoing_swap.chosen_user; [c.bucket_with(o.constituency_ons_id), o.bucket_with(c.constituency_ons_id)].detect{ |x| x.first < 0 } }
+
+      # c = bad.first
+      # o = c.outgoing_swap.chosen_user
+
+      # puts "\nchooser #{c.attributes}"
+      # puts "\nchosen #{o.attributes}"
+
+      # puts "\buckets #{[c.bucket_with(o.constituency_ons_id), o.bucket_with(c.constituency_ons_id)]}"
+
+      # poll1 = Poll::Cache.get(constituency_ons_id: c.constituency_ons_id, party_id: c.preferred_party_id)
+      # poll2 = Poll::Cache.get(constituency_ons_id: o.constituency_ons_id, party_id: c.preferred_party_id)
+
+      # puts "\npoll1 (local) #{poll1.attributes}"
+      # puts "\npoll1 (local) marginal_for_party? #{poll1.marginal_for_party?}"
+      # puts "\npoll1 (local) effort_to_win #{poll1.effort_to_win}"
+      # puts "\n\npoll2 (remote) #{poll2.attributes}"
+      # puts "\npoll2 (remote) marginal_for_party? #{poll2.marginal_for_party?}"
+      # puts "\npoll2 (remote) effort_to_win #{poll2.effort_to_win}"
+
+      # raise "done"
 
       threeway = choosing.map{ |c| o = c.outgoing_swap.chosen_user; [c.bucket_with(o.constituency_ons_id), o.bucket_with(c.constituency_ons_id), c.outgoing_swap.confirmed] }.tally
 
