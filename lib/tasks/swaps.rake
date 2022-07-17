@@ -25,6 +25,39 @@ namespace :swaps do
   end
 
   namespace :analysis do
+
+    desc "expermient with metrics - classify swaps into buckets"
+    task metrics: :environment do
+
+      choosing  = User.left_joins(:outgoing_swap).where("swaps.id IS NOT ?", nil).where("users.constituency_ons_id LIKE '_%'").eager_load(outgoing_swap: :chosen_user)
+      expected_good_bad_ratio = choosing.where("swaps.confirmed = ?", true).count/Float(choosing.where("swaps.confirmed = ?", false).count)
+
+      threeway = choosing.map{ |c| o = c.outgoing_swap.chosen_user; [(c.effort_reduction_from_swap_with(o)/1000.0).floor, (o.effort_reduction_from_swap_with(c)/1000.0).floor, c.outgoing_swap.confirmed] }.tally
+
+      result = Hash.new{ |o,k| o[k] = Hash.new { |o,k| o[k] = 0 } }
+      twoway = threeway.each_with_object(result) { |(k,v), r| new_k = [k[0], k[1]].sort ;  new_sub_k = k[2] ; r[new_k][new_sub_k] = v  }
+
+      lookup = twoway.select{ |o| twoway[o].size == 2 && twoway[o][false] > 0}.map{  |(pair, value)| [pair, value[true]/Float(expected_good_bad_ratio * value[false])] }.sort.to_h
+
+      puts "\n\nsparse map"
+      pp lookup ; nil
+
+      filled_map = Hash.new
+      # diagonal_map = Hash.new { |o,k|  o[k] = []}
+      (-2..3).map do |x|
+        (-2..3).map do |y|
+          key = [x,y].sort
+          filled_map[[x, y]] = lookup[key]
+          # diagonal_map[x+y].push(lookup[key])
+        end
+      end
+
+      puts "\n\nfilled_map"
+      pp filled_map ; nil
+      # pp "\n\ndiagonal_map", diagonal_map ; nil
+
+    end
+
     desc "breakdown the swaps"
     task breakdown: :environment do
 
