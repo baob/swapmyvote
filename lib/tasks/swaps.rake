@@ -89,7 +89,14 @@ namespace :swaps do
       # puts "(k,v), r: #{[k,v,r]}" ;
       twoway = threeway.each_with_object(result) { |(k,v), r|  new_k = order_keys_for_uniqueness(k[0], k[1]) ;  new_sub_k = k[2] ; r[new_k][new_sub_k] = v  }
 
-      lookup = twoway.select{ |o| twoway[o].size == 2 && twoway[o][false] > 1}.map{  |(pair, value)| [pair, value[true]/Float(expected_good_bad_ratio * value[false])] }.sort{ |(a,_),(b, _)| a.first.first*1000 +  a.last.first <=> b.first.first*1000 +  b.last.first  }.to_h
+      def score_conf_or_not_value(value, ratio)
+        # value[true]/Float(expected_good_bad_ratio * value[false])
+        biased_not_conf_count = Float(ratio * (value[false] || 0))
+        conf_count = value[true] || 0
+        return conf_count * 2 / (conf_count + biased_not_conf_count)
+      end
+
+      lookup = twoway.select{ |o| twoway[o].size == 2 && twoway[o][false] > 1}.map{  |(pair, value)| [pair, score_conf_or_not_value(value, expected_good_bad_ratio)] }.sort{ |(a,_),(b, _)| a.first.first*1000 +  a.last.first <=> b.first.first*1000 +  b.last.first  }.to_h
 
       puts "\n\nsparse map"
       pp lookup ; nil
