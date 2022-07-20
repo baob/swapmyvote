@@ -45,7 +45,16 @@ namespace :swaps do
           score = score_against(ons_id)
           mfp_old = Poll::Cache.get(constituency_ons_id: constituency_ons_id, party_id: preferred_party_id)&.marginal_for_party? || false
           mfp_new = Poll::Cache.get(constituency_ons_id: ons_id, party_id: preferred_party_id)&.marginal_for_party? || false
-          r = [score, mfp_new && !mfp_old]
+          # r = [score, mfp_new && !mfp_old]
+
+          c2 = Poll::Cache.get_constituency(ons_id)
+          c1 = Poll::Cache.get_constituency(constituency_ons_id)
+
+          old_type = c1&.voter_type(self) || "unknown"
+          new_type = c2&.voter_type(self) || "unknown"
+
+          r = ["#{old_type}-2-#{new_type}"]
+
           # puts "bucket_with: #{r}"
           r
         end
