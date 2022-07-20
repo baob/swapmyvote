@@ -54,7 +54,6 @@ namespace :swaps do
           new_type = c2&.voter_type(self) || "unknown"
 
           r = ["#{old_type}-2-#{new_type}"]
-
           # puts "bucket_with: #{r}"
           r
         end
@@ -106,7 +105,7 @@ namespace :swaps do
         return conf_count * 2 / (conf_count + biased_not_conf_count)
       end
 
-      lookup = twoway.select{ |o| [twoway[o][false] || 0 , twoway[o][true] || 0].min > 0 }.map{  |(pair, value)| [pair, score_conf_or_not_value(value, expected_good_bad_ratio)] }.sort{ |(a,_),(b, _)| a.first.first*1000 +  a.last.first <=> b.first.first*1000 +  b.last.first  }.to_h
+      lookup = twoway.select{ |o| two_counts = [twoway[o][false] || 0 , twoway[o][true] || 0]; two_counts.sum > 4 }.map{ |(pair, value)| [pair, score_conf_or_not_value(value, expected_good_bad_ratio)] }.sort{ |(a,_),(b, _)| a.first.first*1000 +  a.last.first <=> b.first.first*1000 +  b.last.first  }.to_h
 
       puts "\n\nsparse map"
       pp lookup ; nil

@@ -19,7 +19,7 @@ class OnsConstituency < ApplicationRecord
     @polls_by_marginal_score = polls.order(:marginal_score).all
   end
 
-  MARGINAL_THRESHOLD = 2000
+  MARGINAL_THRESHOLD = 1000
 
   def marginal?
     return @is_marginal if defined?(@is_marginal)
@@ -66,13 +66,14 @@ class OnsConstituency < ApplicationRecord
   end
 
   def voter_type(user)
-    return "wfl_unknown_" + user.preferred_party.name if !marginal_known?
+    # return "wfl_unknown_" + user.preferred_party.name if !marginal_known?
+    return "unknown" if !marginal_known?
     if winner_for_user?(user)
       return "winning"
     elsif marginal_for_user?(user)
       return "fighting"
     elsif loser_for_user?(user)
-      return "losing"
+      return marginal? ? "losing-m" : "losing-s"
     end
   end
 

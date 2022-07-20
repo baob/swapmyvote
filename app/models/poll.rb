@@ -53,7 +53,8 @@ class Poll < ApplicationRecord
   end
 
   def marginal_for_party?
-    marginal_score <= OnsConstituency::MARGINAL_THRESHOLD
+    # marginal_score <= OnsConstituency::MARGINAL_THRESHOLD
+    marginal_score <= 1000
   end
   class Cache
 
