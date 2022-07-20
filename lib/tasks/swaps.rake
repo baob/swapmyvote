@@ -26,8 +26,8 @@ namespace :swaps do
 
   namespace :analysis do
 
-    desc "expermient with metrics - classify swaps into buckets"
-    task metrics: :environment do
+    desc "expermient with metrics - classify swaps into buckets - figure out if the old potential swaps algorithm is good"
+    task metrics_potential_swaps: :environment do
 
       class User
         def score_against(ons_id)
