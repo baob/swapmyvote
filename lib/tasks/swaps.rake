@@ -69,6 +69,13 @@ namespace :swaps do
       choosing  = User.left_joins(:outgoing_swap).where("swaps.id IS NOT ?", nil).where("users.constituency_ons_id LIKE '_%'").eager_load(outgoing_swap: :chosen_user)
       expected_good_bad_ratio = choosing.where("swaps.confirmed = ?", true).count/Float(choosing.where("swaps.confirmed = ?", false).count)
 
+      puts "\nSCORING PRINCIPLE: scores (after =>) represent relative success at turning proposed swaps into confirmed swaps."
+      puts "2.0 means 100% of them, 0.0 means none of them."
+      puts "Threshold between marginal and safe seat is a difference between the first two party votes of #{OnsConstituency::MARGINAL_THRESHOLD/100.0}%"
+
+      puts "\nValues before the => represent the two voters participating in the swap, and what they gain for their preferred party."
+      puts "E.g. fighting-2-winning indicates that voter's preferred party instead of getting a vote in marginal where they are fighting,"
+      puts "instead gets a vote in a constituency where they are winning"
 
       # bad = choosing.select { |c| o = c.outgoing_swap.chosen_user; [c.bucket_with(o.constituency_ons_id), o.bucket_with(c.constituency_ons_id)].detect{ |x| x.first < 0 } }
 
@@ -134,7 +141,7 @@ namespace :swaps do
         score = (lookup[ order_keys_for_uniqueness(k1,k2) ])
       end.compact.map{ |x| x.round(2)}
 
-      puts "\n\npercentage splits for potential swaps with various scores (score => %, score of 1 is average)"
+      puts "\n\nFor all potential swaps, show percentage splits for each possible score.  score => percentage of potential swaps with that score"
       # pp p_swap_scores.tally.sort.to_h
       pp p_swap_scores.tally.sort.map{ |k,v| [k, (v*100.0/p_swap_scores.size).round(1)]}.to_h ; nil
       puts "percentage of potential swaps evaluated #{(p_swap_scores.size*100.0/all_p_swaps.size).round(1)}"
