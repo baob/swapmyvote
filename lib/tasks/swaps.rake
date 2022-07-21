@@ -36,12 +36,16 @@ namespace :swaps do
 
           effort_reduction = (poll1&.votes.nil? || poll2&.votes.nil?) ? -9999 : poll1.effort_to_win - poll2.effort_to_win
           # puts "effort_reduction calc: #{[poll1&.votes.nil?, poll2&.votes.nil?, poll2&.effort_to_win, poll1&.effort_to_win ]}"
-          r = (effort_reduction/1000.0).floor
+          r = (effort_reduction/1000.0).round
           # puts "score_against: #{r}"
           r
         end
 
         def bucket_with(ons_id)
+          [ category_with(ons_id), score_against(ons_id)]
+        end
+
+        def category_with(ons_id)
           score = score_against(ons_id)
           mfp_old = Poll::Cache.get(constituency_ons_id: constituency_ons_id, party_id: preferred_party_id)&.marginal_for_party? || false
           mfp_new = Poll::Cache.get(constituency_ons_id: ons_id, party_id: preferred_party_id)&.marginal_for_party? || false
@@ -53,8 +57,8 @@ namespace :swaps do
           old_type = c1&.voter_type(self) || "unknown"
           new_type = c2&.voter_type(self) || "unknown"
 
-          r = ["#{old_type}-2-#{new_type}"]
-          # puts "bucket_with: #{r}"
+          r = "#{old_type}-2-#{new_type}"
+          # puts "category_with: #{r}"
           r
         end
       end
@@ -64,6 +68,10 @@ namespace :swaps do
         # puts "order_keys_for_uniqueness: #{r}"
         # raise "blurgh" if  r.first.first == -3
         r
+      end
+
+      def sort_hash_by_value(d)
+        d.to_a.sort{ |x,y| x.last <=> y.last }.to_h
       end
 
       choosing  = User.left_joins(:outgoing_swap).where("swaps.id IS NOT ?", nil).where("users.constituency_ons_id LIKE '_%'").eager_load(outgoing_swap: :chosen_user)
@@ -112,10 +120,11 @@ namespace :swaps do
         return conf_count * 2 / (conf_count + biased_not_conf_count)
       end
 
-      lookup = twoway.select{ |o| two_counts = [twoway[o][false] || 0 , twoway[o][true] || 0]; two_counts.sum > 8 }.map{ |(pair, value)| [pair, score_conf_or_not_value(value, expected_good_bad_ratio)] }.sort{ |(a,_),(b, _)| a.first.first*1000 +  a.last.first <=> b.first.first*1000 +  b.last.first  }.to_h
+      lookup = twoway.select{ |o| two_counts = [twoway[o][false] || 0 , twoway[o][true] || 0]; two_counts.sum > 8 }.map{ |(pair, value)| [pair, score_conf_or_not_value(value, expected_good_bad_ratio)] }.to_h
 
       puts "\n\nsparse map"
-      pp lookup ; nil
+      pp sort_hash_by_value(lookup) ; nil
+      # pp lookup ; nil
 
       # filled_map = Hash.new
       # (-2..3).map do |x|
