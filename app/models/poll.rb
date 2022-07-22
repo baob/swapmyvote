@@ -40,4 +40,50 @@ class Poll < ApplicationRecord
       puts if progress
     end
   end
+
+  private def all_polls
+    return @all_polls if defined?(@all_polls)
+    @all_polls = constituency.polls
+  end
+
+  def effort_to_win
+    return @effort_to_win if defined?(@effort_to_win)
+    winner_votes = all_polls.map(&:votes).max
+    @effort_to_win = ((winner_votes - votes) / 2.0).ceil
+  end
+
+  def marginal_for_party?
+    marginal_score <= OnsConstituency::MARGINAL_THRESHOLD
+    # marginal_score <= 1000
+  end
+
+  class Cache
+    class << self
+      @initialized = false
+
+      def initialize
+        return if @initialized
+        @@polls_cache = {}
+        @@constituencies_cache = {}
+        polls = Poll.eager_load(:constituency).limit(13_000)
+        polls.each do |poll|
+          key = { party_id: poll.party_id, constituency_ons_id: poll.constituency_ons_id }
+          # puts key
+          @@polls_cache[key] = poll
+          @@constituencies_cache[poll.constituency_ons_id] = poll.constituency
+        end
+        @initialized = true
+      end
+
+      def get(key)
+        initialize
+        @@polls_cache[key]
+      end
+
+      def get_constituency(ons_id)
+        initialize
+        @@constituencies_cache[ons_id] ||= OnsConstituency.find_by(ons_id: ons_id)
+      end
+    end
+  end
 end
