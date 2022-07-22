@@ -8,7 +8,7 @@ RSpec.describe SwapSuccess do
     let(:key1) { ['aaaa', 123] }
     let(:key2) { ['bbb', 456] }
 
-    subject{ ->(x,y){ described_class.order_keys_for_uniqueness(x, y) } }
+    subject{ described_class.method(:order_keys_for_uniqueness) }
 
     it "maps key pairs in either order to the same thing" do
       expect(subject.call(key1, key2)).to eq(subject.call(key2, key1))
@@ -21,6 +21,7 @@ RSpec.describe SwapSuccess do
   end
 
   describe ".score_conf_or_not_value" do
+    subject{ described_class.method(:score_conf_or_not_value) }
 
     context "overall ratio of succesful/confirmed swaps, to unconfirmed swaps is 8:1" do
       let(:ratio) { 8.0 }
@@ -32,7 +33,7 @@ RSpec.describe SwapSuccess do
           v[false] = 0
           v
         end
-        specify { expect(described_class.score_conf_or_not_value(value,ratio)).to eq(2.0) }
+        specify { expect(subject.call(value, ratio)).to eq(2.0) }
       end
 
       context "and we have 0 confirmed swaps and 12 unconfirmed in this group" do
@@ -42,7 +43,7 @@ RSpec.describe SwapSuccess do
           v[false] = 12
           v
         end
-        specify { expect(described_class.score_conf_or_not_value(value,ratio)).to eq(0.0) }
+        specify { expect(subject.call(value, ratio)).to eq(0.0) }
       end
 
       context "and we have 24 confirmed swaps and 3 unconfirmed in this group (the average ratio)" do
@@ -52,11 +53,8 @@ RSpec.describe SwapSuccess do
           v[false] = 3
           v
         end
-        specify { expect(described_class.score_conf_or_not_value(value,ratio)).to eq(1.0) }
+        specify { expect(subject.call(value, ratio)).to eq(1.0) }
       end
-
     end
-
   end
 end
-
