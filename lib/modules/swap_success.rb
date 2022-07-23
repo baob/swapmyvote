@@ -56,7 +56,7 @@ module SwapSuccess
         # both counts go into the same group
         new_key = order_keys_for_uniqueness(chooser_bucket, chosen_bucket)
 
-        r[new_key][success_or_not] = tally
+        r[new_key][success_or_not] += tally
       end
 
       # now for each group, turn the pair of counts into a score, and return a hash of all of those
