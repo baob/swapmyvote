@@ -33,7 +33,7 @@ RSpec.describe SwapSuccess do
           v[false] = 0
           v
         end
-        specify { expect(subject.call(value, ratio)).to eq(2.0) }
+        specify { expect(subject.call(value, ratio)[0]).to eq(2.0) }
       end
 
       context "and we have all confirmed swaps in this group, but the group size is half the small group threshold" do
@@ -43,7 +43,7 @@ RSpec.describe SwapSuccess do
           v[false] = 0
           v
         end
-        specify { expect(subject.call(value, ratio)).to eq(1.5) }
+        specify { expect(subject.call(value, ratio)[0]).to eq(1.5) }
       end
 
       context "and we have 0 confirmed swaps and 120 unconfirmed in this group" do
@@ -53,7 +53,7 @@ RSpec.describe SwapSuccess do
           v[false] = 120
           v
         end
-        specify { expect(subject.call(value, ratio)).to eq(0.0) }
+        specify { expect(subject.call(value, ratio)[0]).to eq(0.0) }
       end
 
       context "and we have all unconfirmed in this group but the group size is half the small group threshold" do
@@ -63,7 +63,7 @@ RSpec.describe SwapSuccess do
           v[false] = described_class::SMALL_GROUP_THRESHOLD/2.0
           v
         end
-        specify { expect(subject.call(value, ratio)).to eq(0.5) }
+        specify { expect(subject.call(value, ratio)[0]).to eq(0.5) }
       end
 
 
@@ -74,7 +74,7 @@ RSpec.describe SwapSuccess do
           v[false] = 30
           v
         end
-        specify { expect(subject.call(value, ratio)).to eq(1.0) }
+        specify { expect(subject.call(value, ratio)[0]).to eq(1.0) }
       end
     end
   end

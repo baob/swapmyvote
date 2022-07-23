@@ -70,7 +70,7 @@ namespace :swaps do
       puts "\n\nsparse map"
       pp sort_hash_by_value(lookup) ; nil
       all_scores = lookup.map{ |k,v| v }
-      average = all_scores.sum/Float(all_scores.size)
+      average = all_scores.map{ |s| s[0]}.sum/Float(all_scores.size)
 
       puts "\naverage = ", average
 
@@ -79,7 +79,7 @@ namespace :swaps do
         k1 = ps.source_user.bucket_with(ps.target_user.constituency_ons_id)
         k2 = ps.target_user.bucket_with(ps.source_user.constituency_ons_id)
         score = (lookup[ SwapSuccess.order_keys_for_uniqueness(k1,k2) ])
-      end.compact.map{ |x| x.round(2)}
+      end.compact.map{ |x, y| [x.round(2), y]}
 
       puts "\n\nFor all potential swaps, show percentage splits for each possible score.  score => percentage of potential swaps with that score"
       pp p_swap_scores.tally.sort.map{ |k,v| [k, (v*100.0/p_swap_scores.size).round(1)]}.to_h ; nil
