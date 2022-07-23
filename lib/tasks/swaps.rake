@@ -67,8 +67,8 @@ namespace :swaps do
 
       lookup = SwapSuccess.swap_success_lookup
 
-      puts "\n\nsparse map"
-      pp sort_hash_by_value(lookup) ; nil
+      puts "\n\nsparse map (small groups under 50 eliminated)"
+      pp sort_hash_by_value(lookup).select{ |x, y|  y[1] > 50 }.map{ |x,y| [x, [y[0].round(2), y[1]]]} ; nil
       all_scores = lookup.map{ |k,v| v }
       average = all_scores.map{ |s| s[0]}.sum/Float(all_scores.size)
 
