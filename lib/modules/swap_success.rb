@@ -37,7 +37,7 @@ module SwapSuccess
       result = Hash.new{ |o,k| o[k] = Hash.new { |o,k| o[k] = 0 } }
       success_counts = threeway.each_with_object(result) { |(k,v), r|  new_k = order_keys_for_uniqueness(k[0], k[1]) ;  new_sub_k = k[2] ; r[new_k][new_sub_k] = v  }
 
-      lookup = success_counts.select{ |o| keep_success_count(o, success_counts) }.map{ |(pair, success_count)| [pair, score_conf_or_not_value(success_count, expected_good_bad_ratio)] }.to_h
+      lookup = success_counts.map{ |(pair, success_count)| [pair, score_conf_or_not_value(success_count, expected_good_bad_ratio)] }.to_h
     end
   end
 end
