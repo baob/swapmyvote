@@ -43,9 +43,8 @@ RSpec.describe SwapSuccess do
           v[false] = 0
           v
         end
-        specify { expect(subject.call(value, ratio)).to eq(1.0) }
+        specify { expect(subject.call(value, ratio)).to eq(1.5) }
       end
-
 
       context "and we have 0 confirmed swaps and 120 unconfirmed in this group" do
         let(:value) do
@@ -64,7 +63,7 @@ RSpec.describe SwapSuccess do
           v[false] = described_class::SMALL_GROUP_THRESHOLD/2.0
           v
         end
-        specify { expect(subject.call(value, ratio)).to eq(1.0) }
+        specify { expect(subject.call(value, ratio)).to eq(0.5) }
       end
 
 

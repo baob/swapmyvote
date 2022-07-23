@@ -18,7 +18,12 @@ module SwapSuccess
 
       return base_score * 2 if success_count[false] + success_count[true] > SMALL_GROUP_THRESHOLD
 
-      return 1.0 # lets not assume anything
+      small_group_fudge_factor = (success_count[false] + success_count[true]) / Float(SMALL_GROUP_THRESHOLD)
+
+      # 0 = completely unsuccessful, 1 = completely successful
+      adjusted_base_score = (base_score - 0.5) * small_group_fudge_factor + 0.5
+
+      return 2 * adjusted_base_score
     end
 
     def keep_success_count(o, success_counts)
