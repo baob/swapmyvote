@@ -16,6 +16,10 @@ module SwapSuccess
       return conf_count * 2 / (conf_count + biased_not_conf_count)
     end
 
+    def keep_success_count(o, success_counts)
+      two_counts = [success_counts[o][false] || 0 , success_counts[o][true] || 0]; two_counts.sum > SMALL_GROUP_THRESHOLD
+    end
+
     def swap_success_lookup
       choosing  = User.left_joins(:outgoing_swap).where("swaps.id IS NOT ?", nil).where("users.constituency_ons_id LIKE '_%'").eager_load(outgoing_swap: :chosen_user)
       expected_good_bad_ratio = choosing.where("swaps.confirmed = ?", true).count/Float(choosing.where("swaps.confirmed = ?", false).count)
@@ -33,7 +37,7 @@ module SwapSuccess
       result = Hash.new{ |o,k| o[k] = Hash.new { |o,k| o[k] = 0 } }
       success_counts = threeway.each_with_object(result) { |(k,v), r|  new_k = order_keys_for_uniqueness(k[0], k[1]) ;  new_sub_k = k[2] ; r[new_k][new_sub_k] = v  }
 
-      lookup = success_counts.select{ |o| two_counts = [success_counts[o][false] || 0 , success_counts[o][true] || 0]; two_counts.sum > SMALL_GROUP_THRESHOLD }.map{ |(pair, success_count)| [pair, score_conf_or_not_value(success_count, expected_good_bad_ratio)] }.to_h
+      lookup = success_counts.select{ |o| keep_success_count(o, success_counts) }.map{ |(pair, success_count)| [pair, score_conf_or_not_value(success_count, expected_good_bad_ratio)] }.to_h
     end
   end
 end
