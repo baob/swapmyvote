@@ -57,7 +57,10 @@ module SwapSuccess
 
       threeway = choosing.map do |chooser|
         chosen = chooser.outgoing_swap.chosen_user
-        [chooser.bucket_with(chosen.constituency_ons_id), chosen.bucket_with(chooser.constituency_ons_id), chooser.outgoing_swap.confirmed]
+        chooser_poll = Poll::Cache.get(constituency_ons_id: chooser.constituency_ons_id, party_id: chooser.preferred_party_id)
+        chosen_poll = Poll::Cache.get(constituency_ons_id: chosen.constituency_ons_id, party_id: chosen.preferred_party_id)
+
+        [chooser_poll.bucket_with(chosen.constituency_ons_id), chosen_poll.bucket_with(chooser.constituency_ons_id), chooser.outgoing_swap.confirmed]
       end.tally
 
       result = Hash.new{ |o, k| o[k] = Hash.new { |o, k| o[k] = 0 } }

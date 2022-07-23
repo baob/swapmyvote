@@ -59,6 +59,30 @@ class Poll < ApplicationRecord
     # marginal_score <= 1000
   end
 
+  def score_against(ons_id)
+    poll1 = self
+    poll2 = Poll::Cache.get(constituency_ons_id: ons_id, party_id: party_id)
+
+    effort_reduction = (poll1&.votes.nil? || poll2&.votes.nil?) ? -9999 : poll1.effort_to_win - poll2.effort_to_win
+    (effort_reduction/1000.0).round
+  end
+
+  def bucket_with(ons_id)
+    [ category_with(ons_id), score_against(ons_id)]
+  end
+
+  def category_with(ons_id)
+    score = score_against(ons_id)
+
+    c1 = self.constituency
+    c2 = Poll::Cache.get_constituency(ons_id)
+
+    old_type = c1&.voter_type(self) || "unknown"
+    new_type = c2&.voter_type(self) || "unknown"
+
+    "#{old_type}-2-#{new_type}"
+  end
+
   class Cache
     class << self
       @initialized = false
@@ -79,7 +103,7 @@ class Poll < ApplicationRecord
 
       def get(key)
         initialize
-        @@polls_cache[key]
+        @@polls_cache[key] ||= Poll.new(key)
       end
 
       def get_constituency(ons_id)

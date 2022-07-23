@@ -29,34 +29,7 @@ namespace :swaps do
 
     desc "expermient with metrics - classify swaps into buckets - figure out if the old potential swaps algorithm is good"
     task metrics_potential_swaps: :environment do
-
-      class User
-        def score_against(ons_id)
-          poll1 = Poll::Cache.get(constituency_ons_id: constituency_ons_id, party_id: preferred_party_id)
-          poll2 = Poll::Cache.get(constituency_ons_id: ons_id, party_id: preferred_party_id)
-
-          effort_reduction = (poll1&.votes.nil? || poll2&.votes.nil?) ? -9999 : poll1.effort_to_win - poll2.effort_to_win
-          (effort_reduction/1000.0).round
-        end
-
-        def bucket_with(ons_id)
-          [ category_with(ons_id), score_against(ons_id)]
-        end
-
-        def category_with(ons_id)
-          score = score_against(ons_id)
-
-          c2 = Poll::Cache.get_constituency(ons_id)
-          c1 = Poll::Cache.get_constituency(constituency_ons_id)
-
-          old_type = c1&.voter_type(self) || "unknown"
-          new_type = c2&.voter_type(self) || "unknown"
-
-          "#{old_type}-2-#{new_type}"
-        end
-
-      end
-
+      #
       def sort_hash_by_value(d)
         d.to_a.sort{ |x,y| x.last <=> y.last }.to_h
       end
@@ -76,8 +49,11 @@ namespace :swaps do
 
       all_p_swaps = PotentialSwap.eager_load(:source_user => :constituency, :target_user => :constituency)
       p_swap_scores = all_p_swaps.map do |ps|
-        k1 = ps.source_user.bucket_with(ps.target_user.constituency_ons_id)
-        k2 = ps.target_user.bucket_with(ps.source_user.constituency_ons_id)
+        source_user_poll = Poll::Cache.get(constituency_ons_id: ps.source_user.constituency_ons_id, party_id: ps.source_user.preferred_party_id)
+        target_user_poll = Poll::Cache.get(constituency_ons_id: ps.target_user.constituency_ons_id, party_id: ps.target_user.preferred_party_id)
+
+        k1 = source_user_poll.bucket_with(ps.target_user.constituency_ons_id)
+        k2 = target_user_poll.bucket_with(ps.source_user.constituency_ons_id)
         score = (lookup[ SwapSuccess.order_keys_for_uniqueness(k1,k2) ])
       end.compact.map{ |x, y| [x.round(2), y]}
 

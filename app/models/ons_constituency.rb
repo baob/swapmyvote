@@ -31,26 +31,28 @@ class OnsConstituency < ApplicationRecord
     @marginal_known = polls_by_marginal_score.count > 0
   end
 
-  def winner_for_user?(user)
-    marginal_known? && !marginal? && polls_by_marginal_score.first.party_id == user.preferred_party_id
+  # These next 4 methods use poll as a proxy for user, since they both identify party and constituency
+  # this is a bit indirect for regular use, but has major benefits when running analysis over the whole db
+
+  def winner_for_user?(poll)
+    marginal_known? && !marginal? && polls_by_marginal_score.first.party_id == poll.party_id
   end
 
-  def loser_for_user?(user)
-    marginal_known? && !winner_for_user?(user) && !marginal_for_user?(user)
+  def loser_for_user?(poll)
+    marginal_known? && !winner_for_user?(poll) && !marginal_for_user?(poll)
   end
 
-  def marginal_for_user?(user)
-    marginal_known? && marginal? && polls_by_marginal_score[0..1].map(&:party_id).include?(user.preferred_party_id)
+  def marginal_for_user?(poll)
+    marginal_known? && marginal? && polls_by_marginal_score[0..1].map(&:party_id).include?(poll.party_id)
   end
 
-  def voter_type(user)
-    # return "wfl_unknown_" + user.preferred_party.name if !marginal_known?
+  def voter_type(poll)
     return "unknown" unless marginal_known?
-    if winner_for_user?(user)
+    if winner_for_user?(poll)
       return "winning"
-    elsif marginal_for_user?(user)
+    elsif marginal_for_user?(poll)
       return "fighting"
-    elsif loser_for_user?(user)
+    elsif loser_for_user?(poll)
       return marginal? ? "losing-m" : "losing-s"
     end
   end
