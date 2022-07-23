@@ -61,13 +61,9 @@ namespace :swaps do
         d.to_a.sort{ |x,y| x.last <=> y.last }.to_h
       end
 
-      puts "\nSCORING PRINCIPLE: scores (after =>) represent relative success at turning proposed swaps into confirmed swaps."
-      puts "2.0 means 100% of them, 0.0 means none of them."
-      puts "Threshold between marginal and safe seat is a difference between the first two party votes of #{OnsConstituency::MARGINAL_THRESHOLD/100.0}%"
-
-      puts "\nValues before the => represent the two voters participating in the swap, and what they gain for their preferred party."
-      puts "E.g. fighting-2-winning indicates that voter's preferred party instead of getting a vote in marginal where they are fighting,"
-      puts "instead gets a vote in a constituency where they are winning"
+      # explain yourself
+      puts ""
+      puts SwapSuccess.explanation_lines.join("\n")
 
       lookup = SwapSuccess.swap_success_lookup
 

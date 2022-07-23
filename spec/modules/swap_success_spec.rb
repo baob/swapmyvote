@@ -57,4 +57,9 @@ RSpec.describe SwapSuccess do
       end
     end
   end
+
+  describe ".explanation_lines" do
+    subject { described_class.method(:explanation_lines) }
+    specify { expect{subject}.to_not raise_error}
+  end
 end

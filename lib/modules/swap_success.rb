@@ -20,6 +20,18 @@ module SwapSuccess
       two_counts.sum > SMALL_GROUP_THRESHOLD
     end
 
+    def explanation_lines
+      [
+        "SCORING PRINCIPLE: scores (after =>) represent relative success at turning proposed swaps into confirmed swaps.",
+        "2.0 means 100% of them, 0.0 means none of them.",
+        "Threshold between marginal and safe seat is a difference between the first two party votes of #{OnsConstituency::MARGINAL_THRESHOLD/100.0}%",
+        "",
+        "Values before the => represent the two voters participating in the swap, and what they gain for their preferred party.",
+        "E.g. fighting-2-winning indicates that voter's preferred party instead of getting a vote in marginal where they are fighting,",
+        "instead gets a vote in a constituency where they are winning",
+      ]
+    end
+
     def swap_success_lookup
       choosing = User.left_joins(:outgoing_swap)
         .where("swaps.id IS NOT ?", nil)
@@ -29,14 +41,6 @@ module SwapSuccess
       total_confirmed = choosing.where(swaps: { confirmed: true }).count
       total_unconfirmed = choosing.where(swaps: { confirmed: false }).count
       expected_good_bad_ratio = total_confirmed / Float(total_unconfirmed)
-
-      # puts "\nSCORING PRINCIPLE: scores (after =>) represent relative success at turning proposed swaps into confirmed swaps."
-      # puts "2.0 means 100% of them, 0.0 means none of them."
-      # puts "Threshold between marginal and safe seat is a difference between the first two party votes of #{OnsConstituency::MARGINAL_THRESHOLD/100.0}%"
-
-      # puts "\nValues before the => represent the two voters participating in the swap, and what they gain for their preferred party."
-      # puts "E.g. fighting-2-winning indicates that voter's preferred party instead of getting a vote in marginal where they are fighting,"
-      # puts "instead gets a vote in a constituency where they are winning"
 
       threeway = choosing.map do |chooser|
         chosen = chooser.outgoing_swap.chosen_user
