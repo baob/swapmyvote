@@ -26,31 +26,53 @@ RSpec.describe SwapSuccess do
     context "overall ratio of succesful/confirmed swaps, to unconfirmed swaps is 8:1" do
       let(:ratio) { 8.0 }
 
-      context "and we have 24 confirmed swaps and 0 unconfirmed in this group" do
+      context "and we have 240 confirmed swaps and 0 unconfirmed in this group" do
         let(:value) do
           v = Hash.new
-          v[true] = 24
+          v[true] = 240
           v[false] = 0
           v
         end
         specify { expect(subject.call(value, ratio)).to eq(2.0) }
       end
 
-      context "and we have 0 confirmed swaps and 12 unconfirmed in this group" do
+      context "and we have all confirmed swaps in this group, but the group size is half the small group threshold" do
+        let(:value) do
+          v = Hash.new
+          v[true] = described_class::SMALL_GROUP_THRESHOLD/2.0
+          v[false] = 0
+          v
+        end
+        specify { expect(subject.call(value, ratio)).to eq(1.0) }
+      end
+
+
+      context "and we have 0 confirmed swaps and 120 unconfirmed in this group" do
         let(:value) do
           v = Hash.new
           v[true] = 0
-          v[false] = 12
+          v[false] = 120
           v
         end
         specify { expect(subject.call(value, ratio)).to eq(0.0) }
       end
 
-      context "and we have 24 confirmed swaps and 3 unconfirmed in this group (the average ratio)" do
+      context "and we have all unconfirmed in this group but the group size is half the small group threshold" do
         let(:value) do
           v = Hash.new
-          v[true] = 24
-          v[false] = 3
+          v[true] = 0
+          v[false] = described_class::SMALL_GROUP_THRESHOLD/2.0
+          v
+        end
+        specify { expect(subject.call(value, ratio)).to eq(1.0) }
+      end
+
+
+      context "and we have 240 confirmed swaps and 30 unconfirmed in this group (the average ratio)" do
+        let(:value) do
+          v = Hash.new
+          v[true] = 240
+          v[false] = 30
           v
         end
         specify { expect(subject.call(value, ratio)).to eq(1.0) }

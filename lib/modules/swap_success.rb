@@ -11,7 +11,14 @@ module SwapSuccess
     def score_conf_or_not_value(success_count, expected_good_bad_ratio)
       biased_not_conf_count = Float(expected_good_bad_ratio * (success_count[false] || 0))
       conf_count = success_count[true] || 0
-      return conf_count * 2 / (conf_count + biased_not_conf_count)
+
+
+      # 0 = completely unsuccessful, 1 = completely successful, 0.5 = same score as you would expect from looking at all the results
+      base_score = conf_count / (conf_count + biased_not_conf_count)
+
+      return base_score * 2 if success_count[false] + success_count[true] > SMALL_GROUP_THRESHOLD
+
+      return 1.0 # lets not assume anything
     end
 
     def keep_success_count(o, success_counts)
