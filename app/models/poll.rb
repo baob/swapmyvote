@@ -43,6 +43,7 @@ class Poll < ApplicationRecord
 
   private def all_polls
     return @all_polls if defined?(@all_polls)
+    return @all_polls = [] unless constituency
     @all_polls = constituency.polls
   end
 
@@ -51,7 +52,7 @@ class Poll < ApplicationRecord
     # puts "all_polls is #{all_polls.all.to_a}"
     # raise "all_polls is #{all_polls}"
     winner_votes = all_polls.select { |p| p.id != id }.map(&:votes).max
-    @effort_to_win = (winner_votes - votes) / 2.0
+    @effort_to_win = ((winner_votes || 100) - (votes || 0)) / 2.0
   end
 
   def marginal_for_party?
@@ -79,7 +80,7 @@ class Poll < ApplicationRecord
 
       def get(key)
         initialize
-        @@polls_cache[key]
+        @@polls_cache[key] ||= Poll.new(party_id: key[:party_id], constituency: get_constituency(key[:constituency_ons_id]))
       end
 
       def get_constituency(ons_id)

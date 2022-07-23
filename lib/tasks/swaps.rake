@@ -40,7 +40,15 @@ namespace :swaps do
         end
 
         def bucket_with(ons_id)
-          [ category_with(ons_id), score_against(ons_id)]
+          [ category_with(ons_id), score_against(ons_id), marginal_reduction(ons_id) ]
+        end
+
+        def marginal_reduction(ons_id)
+          poll1 = Poll::Cache.get(constituency_ons_id: constituency_ons_id, party_id: preferred_party_id)
+          poll2 = Poll::Cache.get(constituency_ons_id: ons_id, party_id: preferred_party_id)
+
+          marginal_reduction = (poll1&.votes.nil? || poll2&.votes.nil?) ? -9999 : poll1.effort_to_win.abs - poll2.effort_to_win.abs
+          (marginal_reduction/1000.0).round
         end
 
         def category_with(ons_id)
@@ -67,8 +75,8 @@ namespace :swaps do
 
       lookup = SwapSuccess.swap_success_lookup
 
-      puts "\n\nsparse map (small groups under 50 eliminated)"
-      pp sort_hash_by_value(lookup).select{ |x, y|  y[1] > 50 }.map{ |x,y| [x, [y[0].round(2), y[1]]]} ; nil
+      puts "\n\nsparse map (small groups under 30 eliminated)"
+      pp sort_hash_by_value(lookup).select{ |x, y|  y[1] >= 30 }.map{ |x,y| [x, [y[0].round(2), y[1]]]} ; nil
       all_scores = lookup.map{ |k,v| v }
       average = all_scores.map{ |s| s[0]}.sum/Float(all_scores.size)
 

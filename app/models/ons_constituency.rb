@@ -52,6 +52,7 @@ class OnsConstituency < ApplicationRecord
       return "fighting"
     elsif loser_for_user?(user)
       return marginal? ? "losing-m" : "losing-s"
+      # return "losing"
     end
   end
 end
