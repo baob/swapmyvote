@@ -78,6 +78,11 @@ RSpec.describe Poll, type: :model do
       context "with two parties to beat" do
         specify { expect(poll3.effort_to_win*2).to eq(poll1.votes - poll3.votes) }
       end
+
+      context "already winning" do
+        specify { expect(poll1.effort_to_win*2).to eq(poll2.votes - poll1.votes) }
+      end
+
     end
   end
 end
