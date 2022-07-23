@@ -1,5 +1,6 @@
 module SwapSuccess
 
+  SMALL_GROUP_THRESHOLD = 8
 
   class << self
 
@@ -7,9 +8,11 @@ module SwapSuccess
       k1.hash > k2.hash ? [k1, k2] : [k2, k1]
     end
 
-    def score_conf_or_not_value(value, ratio)
-      biased_not_conf_count = Float(ratio * (value[false] || 0))
-      conf_count = value[true] || 0
+    # success_count is a hash, represent counts of confirmed and unconfirned swaps for a given group of voters.
+
+    def score_conf_or_not_value(success_count, expected_good_bad_ratio)
+      biased_not_conf_count = Float(expected_good_bad_ratio * (success_count[false] || 0))
+      conf_count = success_count[true] || 0
       return conf_count * 2 / (conf_count + biased_not_conf_count)
     end
 
@@ -28,12 +31,9 @@ module SwapSuccess
       threeway = choosing.map{ |c| o = c.outgoing_swap.chosen_user; [c.bucket_with(o.constituency_ons_id), o.bucket_with(c.constituency_ons_id), c.outgoing_swap.confirmed] }.tally
 
       result = Hash.new{ |o,k| o[k] = Hash.new { |o,k| o[k] = 0 } }
-      twoway = threeway.each_with_object(result) { |(k,v), r|  new_k = order_keys_for_uniqueness(k[0], k[1]) ;  new_sub_k = k[2] ; r[new_k][new_sub_k] = v  }
+      success_counts = threeway.each_with_object(result) { |(k,v), r|  new_k = order_keys_for_uniqueness(k[0], k[1]) ;  new_sub_k = k[2] ; r[new_k][new_sub_k] = v  }
 
-
-      lookup = twoway.select{ |o| two_counts = [twoway[o][false] || 0 , twoway[o][true] || 0]; two_counts.sum > 8 }.map{ |(pair, value)| [pair, score_conf_or_not_value(value, expected_good_bad_ratio)] }.to_h
+      lookup = success_counts.select{ |o| two_counts = [success_counts[o][false] || 0 , success_counts[o][true] || 0]; two_counts.sum > SMALL_GROUP_THRESHOLD }.map{ |(pair, success_count)| [pair, score_conf_or_not_value(success_count, expected_good_bad_ratio)] }.to_h
     end
   end
-
-
 end
