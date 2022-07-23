@@ -57,4 +57,27 @@ RSpec.describe Poll, type: :model do
       end
     end
   end
+
+  describe "#effort_to_win" do
+
+    context "on a single constituency, split 32.56%, 27.31%, 19.43%" do
+
+      let(:constituency1) { build(:ons_constituency) }
+      let(:poll1) { build(:poll, id: 12, votes: 3256, party_id: 22, constituency: constituency1) }
+      let(:poll2) { build(:poll, id: 13, votes: 2731, party_id: 23, constituency: constituency1) }
+      let(:poll3) { build(:poll, id: 14, votes: 1943, party_id: 24, constituency: constituency1) }
+
+      before do
+        # there's probably a way to avoid this mock by using a cleverer factory
+        allow(constituency1).to receive(:polls).and_return([poll1, poll2, poll3])
+      end
+
+      context "with one party to beat" do
+        specify { expect(poll2.effort_to_win*2).to eq(poll1.votes - poll2.votes) }
+      end
+      context "with two parties to beat" do
+        specify { expect(poll3.effort_to_win*2).to eq(poll1.votes - poll3.votes) }
+      end
+    end
+  end
 end

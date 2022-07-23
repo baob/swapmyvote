@@ -48,8 +48,10 @@ class Poll < ApplicationRecord
 
   def effort_to_win
     return @effort_to_win if defined?(@effort_to_win)
+    # puts "all_polls is #{all_polls.all.to_a}"
+    # raise "all_polls is #{all_polls}"
     winner_votes = all_polls.map(&:votes).max
-    @effort_to_win = ((winner_votes - votes) / 2.0).ceil
+    @effort_to_win = (winner_votes - votes) / 2.0
   end
 
   def marginal_for_party?
