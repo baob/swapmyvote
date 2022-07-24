@@ -120,6 +120,16 @@ class User < ApplicationRecord
     return one_swap_from_possible_users(swaps)
   end
 
+  def every_complementary_voter
+    User
+      .where(
+        preferred_party_id: willing_party_id,
+        willing_party_id: preferred_party_id
+      )
+      .where("users.email like '_%'") # We need emails to send confirmation emails
+      .where.not(users: { constituency_ons_id: constituency_ons_id }) # Ignore if my constituency
+  end
+
   private def complementary_voters
     user_ids_already_in_potential_swaps = potential_swaps.reload.map(&:target_user_id)
     user_ids_we_dont_want = user_ids_already_in_potential_swaps + [id]
