@@ -1,4 +1,6 @@
 require_relative '../modules/swap_success'
+# require_relative '../../app/models/poll'
+
 
 namespace :swaps do
   desc "Print a CSV of confirmed swaps"
@@ -35,10 +37,10 @@ namespace :swaps do
           poll1 = Poll::Cache.get(constituency_ons_id: constituency_ons_id, party_id: preferred_party_id)
           poll2 = Poll::Cache.get(constituency_ons_id: ons_id, party_id: preferred_party_id)
 
-          dump_and_raise(poll1) if poll1&.votes.nil?
-          dump_and_raise(poll2) if poll2&.votes.nil?
+          dump_and_raise(poll1) if poll1&.safe_votes.nil?
+          dump_and_raise(poll2) if poll2&.safe_votes.nil?
 
-          effort_reduction = (poll1&.votes.nil? || poll2&.votes.nil?) ? -9999 : poll1.effort_to_win - poll2.effort_to_win
+          effort_reduction = (poll1&.safe_votes.nil? || poll2&.safe_votes.nil?) ? -9999 : poll1.effort_to_win - poll2.effort_to_win
           (effort_reduction/1000.0).round
         end
 
@@ -62,10 +64,10 @@ namespace :swaps do
           poll1 = Poll::Cache.get(constituency_ons_id: constituency_ons_id, party_id: preferred_party_id)
           poll2 = Poll::Cache.get(constituency_ons_id: ons_id, party_id: preferred_party_id)
 
-          dump_and_raise(poll1) if poll1&.votes.nil?
-          dump_and_raise(poll2) if poll2&.votes.nil?
+          dump_and_raise(poll1) if poll1&.safe_votes.nil?
+          dump_and_raise(poll2) if poll2&.safe_votes.nil?
 
-          marginal_reduction = (poll1&.votes.nil? || poll2&.votes.nil?) ? -9999 : poll1.effort_to_win.abs - poll2.effort_to_win.abs
+          marginal_reduction = (poll1&.safe_votes.nil? || poll2&.safe_votes.nil?) ? -9999 : poll1.effort_to_win.abs - poll2.effort_to_win.abs
           (marginal_reduction/1000.0).round
         end
 
@@ -82,6 +84,7 @@ namespace :swaps do
         end
 
       end
+
 
       def sort_hash_by_value(d)
         d.to_a.sort{ |x,y| x.last <=> y.last }.to_h

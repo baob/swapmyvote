@@ -55,16 +55,16 @@ class Poll < ApplicationRecord
 
     return @effort_to_win = 0 if !best_vote # if this is the only party, it's clearly the winner
 
-    this_vote = votes || 0
+    # this_vote = votes || 0
 
-    return @effort_to_win = (best_vote - this_vote) / 2.0 if (this_vote > best_vote) # negative effort if this is the winner
+    return @effort_to_win = (best_vote - safe_votes) / 2.0 if (safe_votes > best_vote) # negative effort if this is the winner
 
-    votes_to_beat = all_polls.select { |p| p.id != id && p.votes > votes }.map(&:votes)
-    votes_needed = (votes_to_beat.sum + this_vote) / Float(votes_to_beat.count + 1)
+    votes_to_beat = all_polls.select { |p| p.id != id && p.votes > safe_votes }.map(&:votes)
+    votes_needed = (votes_to_beat.sum + safe_votes) / Float(votes_to_beat.count + 1)
 
     # puts "effort #{votes_needed - votes}" if votes_to_beat.count > 1
 
-    @effort_to_win = votes_needed - votes
+    @effort_to_win = votes_needed - safe_votes
   end
 
   def marginal_for_party?
@@ -72,6 +72,11 @@ class Poll < ApplicationRecord
     # marginal_score <= 1000
   end
 
+  def safe_votes
+    return votes if votes
+    return 0 if constituency.polls.count > 0 # if there are other polls, safe to assume this party has no votes
+    return nil
+  end
   class Cache
     class << self
       @initialized = false
