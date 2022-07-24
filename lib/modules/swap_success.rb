@@ -61,7 +61,7 @@ module SwapSuccess
 
       threeway = choosing.map do |chooser|
         chosen = chooser.outgoing_swap.chosen_user
-        no_polls = chosen.constituency.polls_by_marginal_score.count == 0 || chooser.constituency.polls_by_marginal_score.count == 0
+        no_polls = chosen.constituency.polls_count == 0 || chooser.constituency.polls_count == 0
         no_polls ? nil : [chooser.bucket_with(chosen.constituency_ons_id), chosen.bucket_with(chooser.constituency_ons_id), chooser.outgoing_swap.confirmed]
       end.compact.tally
 
