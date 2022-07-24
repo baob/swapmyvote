@@ -118,7 +118,7 @@ namespace :swaps do
           k2 = ps.target_user.bucket_with(ps.source_user.constituency_ons_id)
           score = (lookup[ SwapSuccess.order_keys_for_uniqueness(k1,k2) ])
         end
-      end.compact.map{ |x, y| [x.round(2), y]}
+      end.compact.map{ |x, y| x.round(1)} # discard the group count so that same score values get merged in the tally
 
       puts "\n\nFor all potential swaps, show percentage splits for each possible score.  score => percentage of potential swaps with that score"
       pp p_swap_scores.tally.sort.map{ |k,v| [k, (v*100.0/p_swap_scores.size).round(1)]}.to_h ; nil
