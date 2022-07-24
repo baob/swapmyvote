@@ -48,13 +48,12 @@ module SwapSuccess
     def swap_success_lookup
       choosing = User.left_joins(:outgoing_swap)
         .where("swaps.id IS NOT ?", nil)
-        .where("users.constituency_ons_id LIKE '_%'")
+        .where("ons_constituencies.ons_id IS NOT ?", nil)
+        .where("constituencies_users.ons_id IS NOT ?", nil)
         .eager_load({
           outgoing_swap: { chosen_user: {constituency: :polls }},
           constituency: :polls
         })
-        # .select("count(polls.id) as count_polls")
-        # .where("count_polls > 0")
 
       total_confirmed = choosing.where(swaps: { confirmed: true }).count
       total_unconfirmed = choosing.where(swaps: { confirmed: false }).count

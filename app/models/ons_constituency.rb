@@ -13,8 +13,8 @@ class OnsConstituency < ApplicationRecord
            dependent: :destroy
 
   def polls_count
-    return @polls_count if defined?(polls_count)
-    @polls_count = polls.count
+    return @polls_count if defined?(@polls_count)
+    @polls_count = polls.count || 0
   end
 
   def parties_by_marginal_score
