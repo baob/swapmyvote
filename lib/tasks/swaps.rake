@@ -1,5 +1,7 @@
 require_relative '../modules/swap_success'
 
+
+
 namespace :swaps do
   desc "Print a CSV of confirmed swaps"
   task csv: :environment do
@@ -29,7 +31,6 @@ namespace :swaps do
 
     desc "expermient with metrics - classify swaps into buckets - figure out if the old potential swaps algorithm is good"
     task metrics_potential_swaps: :environment do
-
       class User
         def score_against(ons_id)
           poll1 = Poll::Cache.get(constituency_ons_id: constituency_ons_id, party_id: preferred_party_id)
@@ -80,13 +81,14 @@ namespace :swaps do
 
           "#{old_type}-2-#{new_type}"
         end
-
       end
 
 
       def sort_hash_by_value(d)
         d.to_a.sort{ |x,y| x.last <=> y.last }.to_h
       end
+
+      # ---------------- SWAPS SCORING BASED ON CONFIRMED/UNCONFIRMED ---------------------
 
       # explain yourself
       puts ""
@@ -100,6 +102,8 @@ namespace :swaps do
       average = all_scores.map{ |s| s[0]}.sum/Float(all_scores.size)
 
       puts "\naverage = ", average
+
+      # -------------------------------- POTENTIAL SWAPS ---------------------------------
 
       all_p_swaps = PotentialSwap
         .eager_load(:source_user => :constituency, :target_user => :constituency)
@@ -123,6 +127,43 @@ namespace :swaps do
       puts "\n\nFor all potential swaps, show percentage splits for each possible score.  score => percentage of potential swaps with that score"
       pp p_swap_scores.tally.sort.map{ |k,v| [k, (v*100.0/p_swap_scores.size).round(1)]}.to_h ; nil
       puts "percentage of potential swaps evaluated #{(p_swap_scores.size*100.0/all_p_swaps.size).round(1)}"
+
+      # ---------------------- ALL POSSIBLE VARIATIONS OF SWAPS --------------------------
+
+      users = User
+        .where("ons_constituencies.ons_id IS NOT ?", nil)
+        .where("users.preferred_party_id IS NOT ?", nil)
+        .where("users.willing_party_id IS NOT ?", nil)
+        .eager_load([ :constituency ]) # .limit(2000)
+
+      user_types = Hash.new { |o,k|  o[k]= 0}
+      swap_types = Hash.new { |o,k|  o[k]= 0}
+
+      users.each do |user|
+        key = { preferred_party_id: user.preferred_party_id, willing_party_id: user.willing_party_id, constituency_ons_id: user.constituency_ons_id }
+        user_types[key] += 1
+      end
+
+      puts "\nuser types #{user_types.count}"
+      puts "users      #{users.count}"
+
+      user_types.each do |(type, count)|
+        user = User.new(type)
+        comps = user.every_complementary_voter.pluck(:constituency_ons_id)
+        comps.each do |comp|
+          key = type
+          key[:other_ons_id] = comp
+          swap_types[key] += count
+        end
+      end
+
+      puts "\nuser types #{user_types.count}"
+      puts "swap types #{swap_types.count}"
+      puts "users      #{users.count}"
+
+      puts "largest swap type group #{swap_types.values.max}"
+      puts "smallest swap type group #{swap_types.values.min}"
+      puts "average swap type group #{swap_types.values.sum / Float(swap_types.values.count)}"
     end
 
   end
