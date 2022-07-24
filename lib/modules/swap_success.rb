@@ -49,7 +49,12 @@ module SwapSuccess
       choosing = User.left_joins(:outgoing_swap)
         .where("swaps.id IS NOT ?", nil)
         .where("users.constituency_ons_id LIKE '_%'")
-        .eager_load(outgoing_swap: :chosen_user)
+        .eager_load({
+          outgoing_swap: { chosen_user: {constituency: :polls }},
+          constituency: :polls
+        })
+        # .select("count(polls.id) as count_polls")
+        # .where("count_polls > 0")
 
       total_confirmed = choosing.where(swaps: { confirmed: true }).count
       total_unconfirmed = choosing.where(swaps: { confirmed: false }).count
@@ -57,8 +62,9 @@ module SwapSuccess
 
       threeway = choosing.map do |chooser|
         chosen = chooser.outgoing_swap.chosen_user
-        [chooser.bucket_with(chosen.constituency_ons_id), chosen.bucket_with(chooser.constituency_ons_id), chooser.outgoing_swap.confirmed]
-      end.tally
+        no_polls = chosen.constituency.polls_by_marginal_score.count == 0 || chooser.constituency.polls_by_marginal_score.count == 0
+        no_polls ? nil : [chooser.bucket_with(chosen.constituency_ons_id), chosen.bucket_with(chooser.constituency_ons_id), chooser.outgoing_swap.confirmed]
+      end.compact.tally
 
       result = Hash.new{ |o, k| o[k] = Hash.new { |o, k| o[k] = 0 } }
 
