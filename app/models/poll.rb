@@ -51,8 +51,20 @@ class Poll < ApplicationRecord
     return @effort_to_win if defined?(@effort_to_win)
     # puts "all_polls is #{all_polls.all.to_a}"
     # raise "all_polls is #{all_polls}"
-    winner_votes = all_polls.select { |p| p.id != id }.map(&:votes).max
-    @effort_to_win = ((winner_votes || 100) - (votes || 0)) / 2.0
+    best_vote = all_polls.select { |p| p.id != id }.map(&:votes).max
+
+    return @effort_to_win = 0 if !best_vote # if this is the only party, it's clearly the winner
+
+    this_vote = votes || 0
+
+    return @effort_to_win = (best_vote - this_vote) / 2.0 if (this_vote > best_vote) # negative effort if this is the winner
+
+    votes_to_beat = all_polls.select { |p| p.id != id && p.votes > votes }.map(&:votes)
+    votes_needed = (votes_to_beat.sum + this_vote) / Float(votes_to_beat.count + 1)
+
+    # puts "effort #{votes_needed - votes}" if votes_to_beat.count > 1
+
+    @effort_to_win = votes_needed - votes
   end
 
   def marginal_for_party?

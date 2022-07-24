@@ -76,7 +76,7 @@ RSpec.describe Poll, type: :model do
         specify { expect(poll2.effort_to_win*2).to eq(poll1.votes - poll2.votes) }
       end
       context "with two parties to beat" do
-        specify { expect(poll3.effort_to_win*2).to eq(poll1.votes - poll3.votes) }
+        specify { expect(poll3.effort_to_win*2).to be > (poll1.votes - poll3.votes) }
       end
 
       context "already winning" do
