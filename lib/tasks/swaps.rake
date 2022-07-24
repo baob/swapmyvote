@@ -35,8 +35,23 @@ namespace :swaps do
           poll1 = Poll::Cache.get(constituency_ons_id: constituency_ons_id, party_id: preferred_party_id)
           poll2 = Poll::Cache.get(constituency_ons_id: ons_id, party_id: preferred_party_id)
 
+          dump_and_raise(poll1) if poll1&.votes.nil?
+          dump_and_raise(poll2) if poll2&.votes.nil?
+
           effort_reduction = (poll1&.votes.nil? || poll2&.votes.nil?) ? -9999 : poll1.effort_to_win - poll2.effort_to_win
           (effort_reduction/1000.0).round
+        end
+
+        def dump_and_raise(poll)
+          puts "votes nil problem"
+          puts "poll", poll.attributes
+          puts "user", self.attributes
+          constituency = OnsConstituency.find_by(ons_id: poll.constituency_ons_id)
+          puts "constituency name", constituency.attributes
+          puts "constituency polls", constituency.polls.map(&:attributes)
+          party = Party.find(preferred_party_id)
+          puts "party", party.attributes
+          raise "votes nil problem"
         end
 
         def bucket_with(ons_id)
@@ -46,6 +61,9 @@ namespace :swaps do
         def marginal_reduction(ons_id)
           poll1 = Poll::Cache.get(constituency_ons_id: constituency_ons_id, party_id: preferred_party_id)
           poll2 = Poll::Cache.get(constituency_ons_id: ons_id, party_id: preferred_party_id)
+
+          dump_and_raise(poll1) if poll1&.votes.nil?
+          dump_and_raise(poll2) if poll2&.votes.nil?
 
           marginal_reduction = (poll1&.votes.nil? || poll2&.votes.nil?) ? -9999 : poll1.effort_to_win.abs - poll2.effort_to_win.abs
           (marginal_reduction/1000.0).round
