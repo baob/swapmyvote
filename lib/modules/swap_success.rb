@@ -50,10 +50,10 @@ module SwapSuccess
         .where("swaps.id IS NOT ?", nil)
         .where("ons_constituencies.ons_id IS NOT ?", nil)
         .where("constituencies_users.ons_id IS NOT ?", nil)
-        .eager_load({
-          outgoing_swap: { chosen_user: {constituency: :polls }},
-          constituency: :polls
-        })
+        .eager_load([
+          {outgoing_swap: { chosen_user: :constituency }},
+          :constituency
+        ])
 
       total_confirmed = choosing.where(swaps: { confirmed: true }).count
       total_unconfirmed = choosing.where(swaps: { confirmed: false }).count
