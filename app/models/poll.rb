@@ -55,8 +55,6 @@ class Poll < ApplicationRecord
 
     return @effort_to_win = 0 if !best_vote # if this is the only party, it's clearly the winner
 
-    # this_vote = votes || 0
-
     return @effort_to_win = (best_vote - safe_votes) / 2.0 if (safe_votes > best_vote) # negative effort if this is the winner
 
     votes_to_beat = all_polls.select { |p| p.id != id && p.votes > safe_votes }.map(&:votes)
@@ -74,12 +72,11 @@ class Poll < ApplicationRecord
 
   def safe_votes
     return votes if votes
-    # return 0
     return 0 if constituency.polls_count > 0 # if there are other polls, safe to assume this party has no votes
+
     puts "votes missing"
     puts "poll #{self.attributes}"
     raise "safe votes failed"
-    # return nil
   end
   class Cache
     class << self

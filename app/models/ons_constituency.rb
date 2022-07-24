@@ -22,12 +22,7 @@ class OnsConstituency < ApplicationRecord
   end
 
   def polls_by_marginal_score
-    # puts "entering polls_by_marginal_score working for #{self}"
-    if defined? @polls_by_marginal_score
-      # puts "cached polls_by_marginal_score working for #{self.attributes}"
-      # raise "check the log"
-      return @polls_by_marginal_score
-    end
+    return @polls_by_marginal_score if defined? @polls_by_marginal_score
     @polls_by_marginal_score = polls.order(:marginal_score).all
   end
 
