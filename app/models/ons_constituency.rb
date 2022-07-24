@@ -12,6 +12,11 @@ class OnsConstituency < ApplicationRecord
            foreign_key: "constituency_ons_id",
            dependent: :destroy
 
+  def polls_count
+    return @polls_count if defined?(polls_count)
+    @polls_count = polls.count
+  end
+
   def parties_by_marginal_score
     polls_by_marginal_score.map(&:party)
   end

@@ -107,9 +107,14 @@ namespace :swaps do
         .eager_load(:source_user => :constituency, :target_user => :constituency)
         .where("ons_constituencies.ons_id IS NOT ?", nil)
         .where("constituencies_users.ons_id IS NOT ?", nil) # .all.map{ |x| :fred}
-        # raise "check the log"
+
       p_swap_scores = all_p_swaps.map do |ps|
-        no_polls = ps.source_user.constituency.polls_by_marginal_score.count == 0 || ps.target_user.constituency.polls_by_marginal_score.count == 0
+
+        c2 = Poll::Cache.get_constituency(ps.target_user.constituency_ons_id)
+        c1 = Poll::Cache.get_constituency(ps.source_user.constituency_ons_id)
+
+        no_polls = c1.polls_count == 0 || c2.polls_count == 0
+
         unless no_polls
           k1 = ps.source_user.bucket_with(ps.target_user.constituency_ons_id)
           k2 = ps.target_user.bucket_with(ps.source_user.constituency_ons_id)

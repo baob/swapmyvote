@@ -74,8 +74,9 @@ class Poll < ApplicationRecord
 
   def safe_votes
     return votes if votes
-    return 0 if constituency.polls.count > 0 # if there are other polls, safe to assume this party has no votes
-    return nil
+    return 0
+    # return 0 if constituency.polls.count > 0 # if there are other polls, safe to assume this party has no votes
+    # return nil
   end
   class Cache
     class << self
