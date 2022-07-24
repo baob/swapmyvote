@@ -33,7 +33,7 @@ class OnsConstituency < ApplicationRecord
 
   def marginal_known?
     return @marginal_known if defined?(@marginal_known)
-    @marginal_known = polls_by_marginal_score.count > 0
+    @marginal_known = polls_count > 0
   end
 
   def winner_for_user?(user)
