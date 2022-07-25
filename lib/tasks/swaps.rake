@@ -84,9 +84,8 @@ namespace :swaps do
       end
     end
 
-    desc "expermient with metrics - classify swaps into buckets - figure out if the old potential swaps algorithm is good"
-    task metrics_potential_swaps: :analysis_setup do
-
+    desc "categorise swap types and show a success metric"
+    task success_metrics: :analysis_setup do
 
       def sort_hash_by_value(d)
         d.to_a.sort{ |x,y| x.last <=> y.last }.to_h
@@ -101,11 +100,20 @@ namespace :swaps do
       lookup = SwapSuccess.swap_success_lookup
 
       puts "\n\nsparse map (small groups under 30 eliminated)"
-      pp sort_hash_by_value(lookup).select{ |x, y|  y[1] >= 30 }.map{ |x,y| [x, [y[0].round(2), y[1]]]} ; nil
+      pp sort_hash_by_value(lookup).select{ |x, y|  y[1] >= 30 }.map{ |x,y| [x, [y[0].round(2), y[1]]]}
+
       all_scores = lookup.map{ |k,v| v }
       average = all_scores.map{ |s| s[0]}.sum/Float(all_scores.size)
 
       puts "\naverage = ", average
+    end
+
+    desc "classify swaps into buckets - figure out if the old potential swaps algorithm is good"
+    task potential_swaps: :analysis_setup do
+
+      # TODO: explain yourself
+
+      lookup = SwapSuccess.swap_success_lookup
 
       # -------------------------------- POTENTIAL SWAPS ---------------------------------
 
@@ -131,6 +139,14 @@ namespace :swaps do
       puts "\n\nFor all potential swaps, show percentage splits for each possible score.  score => percentage of potential swaps with that score"
       pp p_swap_scores.tally.sort.map{ |k,v| [k, (v*100.0/p_swap_scores.size).round(1)]}.to_h ; nil
       puts "percentage of potential swaps evaluated #{(p_swap_scores.size*100.0/all_p_swaps.size).round(1)}"
+    end
+
+    desc "classify swaps into buckets - figure out if the success over every potential swap"
+    task all_possible_swap_types: :analysis_setup do
+
+      # TODO: explain yourself
+
+      lookup = SwapSuccess.swap_success_lookup
 
       # ---------------------- ALL POSSIBLE VARIATIONS OF SWAPS --------------------------
 
