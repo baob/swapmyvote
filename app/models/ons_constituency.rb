@@ -52,12 +52,12 @@ class OnsConstituency < ApplicationRecord
     # return "wfl_unknown_" + user.preferred_party.name if !marginal_known?
     return "unknown" unless marginal_known?
     if winner_for_user?(user)
-      return "winning"
+      return "win"
     elsif marginal_for_user?(user)
-      return "fighting"
+      return "fight"
     elsif loser_for_user?(user)
-      return marginal? ? "losing-m" : "losing-s"
-      # return "losing"
+      return marginal? ? "loseM" : "loseS"
+      # return "lose"
     end
   end
 end
