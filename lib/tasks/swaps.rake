@@ -59,7 +59,7 @@ namespace :swaps do
           polls = two_polls_from_cache(ons_id)
 
           effort_reduction = polls.first.effort_to_win - polls.last.effort_to_win
-          (effort_reduction/1000.0).round
+          (effort_reduction/1000.0).ceil
         end
 
         def marginal_reduction(ons_id)
