@@ -32,17 +32,6 @@ namespace :swaps do
     task analysis_setup: :environment do
 
       class User
-        def score_against(ons_id)
-          poll1 = Poll::Cache.get(constituency_ons_id: constituency_ons_id, party_id: preferred_party_id)
-          poll2 = Poll::Cache.get(constituency_ons_id: ons_id, party_id: preferred_party_id)
-
-          dump_and_raise(poll1) if poll1&.safe_votes.nil?
-          dump_and_raise(poll2) if poll2&.safe_votes.nil?
-
-          effort_reduction = poll1.effort_to_win - poll2.effort_to_win
-          (effort_reduction/1000.0).round
-        end
-
         def dump_and_raise(poll)
           puts "votes nil problem"
           puts "poll", poll.attributes
@@ -55,31 +44,43 @@ namespace :swaps do
           raise "votes nil problem"
         end
 
-        def bucket_with(ons_id)
-          [ category_with(ons_id), score_against(ons_id), marginal_reduction(ons_id) ]
-        end
-
-        def marginal_reduction(ons_id)
+        def two_polls_from_cache(ons_id)
           poll1 = Poll::Cache.get(constituency_ons_id: constituency_ons_id, party_id: preferred_party_id)
           poll2 = Poll::Cache.get(constituency_ons_id: ons_id, party_id: preferred_party_id)
 
           dump_and_raise(poll1) if poll1&.safe_votes.nil?
           dump_and_raise(poll2) if poll2&.safe_votes.nil?
 
-          marginal_reduction = (poll1.effort_to_win.abs - poll2.effort_to_win.abs)
+          # note: poll from MY constituency is first
+          [poll1, poll2]
+        end
+
+        def effort_reduction(ons_id)
+          polls = two_polls_from_cache(ons_id)
+
+          effort_reduction = polls.first.effort_to_win - polls.last.effort_to_win
+          (effort_reduction/1000.0).round
+        end
+
+        def marginal_reduction(ons_id)
+          polls = two_polls_from_cache(ons_id)
+
+          marginal_reduction = (polls.first.effort_to_win.abs - polls.last.effort_to_win.abs)
           (marginal_reduction/1000.0).round
         end
 
         def category_with(ons_id)
-          score = score_against(ons_id)
-
-          c2 = Poll::Cache.get_constituency(ons_id)
           c1 = Poll::Cache.get_constituency(constituency_ons_id)
+          c2 = Poll::Cache.get_constituency(ons_id)
 
           old_type = c1&.voter_type(self) || "unknown"
           new_type = c2&.voter_type(self) || "unknown"
 
           "#{old_type}-2-#{new_type}"
+        end
+
+        def bucket_with(ons_id)
+          [ category_with(ons_id), effort_reduction(ons_id), marginal_reduction(ons_id) ]
         end
       end
     end
@@ -181,9 +182,11 @@ namespace :swaps do
       puts "swap types #{swap_types.count}"
       puts "users      #{users.count}"
 
-      puts "largest swap type group #{swap_types.values.max}"
+      puts "\nlargest swap type group #{swap_types.values.max}"
       puts "smallest swap type group #{swap_types.values.min}"
       puts "average swap type group #{swap_types.values.sum / Float(swap_types.values.count)}"
+
+      puts "\nCODE INCOMPLETE - ADD SUCCESS METRICS"
     end
 
   end
