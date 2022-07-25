@@ -29,8 +29,8 @@ namespace :swaps do
 
   namespace :analysis do
 
-    desc "expermient with metrics - classify swaps into buckets - figure out if the old potential swaps algorithm is good"
-    task metrics_potential_swaps: :environment do
+    task analysis_setup: :environment do
+
       class User
         def score_against(ons_id)
           poll1 = Poll::Cache.get(constituency_ons_id: constituency_ons_id, party_id: preferred_party_id)
@@ -82,6 +82,10 @@ namespace :swaps do
           "#{old_type}-2-#{new_type}"
         end
       end
+    end
+
+    desc "expermient with metrics - classify swaps into buckets - figure out if the old potential swaps algorithm is good"
+    task metrics_potential_swaps: :analysis_setup do
 
 
       def sort_hash_by_value(d)
