@@ -26,7 +26,7 @@ namespace :swaps do
   namespace :analysis do
 
     task analysis_setup: :environment do
-      require_relative '../modules/swap_success'
+      require_relative '../modules/swap_conversions'
     end
 
     desc "categorise swap types and show a success metric"

@@ -5,7 +5,7 @@ module SwapConversions
     def dump_and_raise(poll)
       puts "votes nil problem"
       puts "poll", poll.attributes
-      puts "user", self.attributes
+      puts "user", attributes
       constituency = OnsConstituency.find_by(ons_id: poll.constituency_ons_id)
       puts "constituency name", constituency.attributes
       puts "constituency polls", constituency.polls.map(&:attributes)
@@ -21,7 +21,7 @@ module SwapConversions
       dump_and_raise(poll1) if poll1&.safe_votes.nil?
       dump_and_raise(poll2) if poll2&.safe_votes.nil?
 
-      # note: poll from MY constituency is first
+      # NOTE: poll from MY constituency is first
       [poll1, poll2]
     end
 
@@ -29,14 +29,14 @@ module SwapConversions
       polls = two_polls_from_cache(ons_id)
 
       effort_reduction = polls.first.effort_to_win - polls.last.effort_to_win
-      (effort_reduction/1000.0).ceil
+      (effort_reduction / 1000.0).ceil
     end
 
     def marginal_reduction(ons_id)
       polls = two_polls_from_cache(ons_id)
 
       marginal_reduction = (polls.first.effort_to_win.abs - polls.last.effort_to_win.abs)
-      (marginal_reduction/1000.0).round
+      (marginal_reduction / 1000.0).round
     end
 
     def category_with(ons_id)
@@ -53,7 +53,6 @@ module SwapConversions
       [ category_with(ons_id), effort_reduction(ons_id), marginal_reduction(ons_id) ]
     end
   end
-
 
   class << self
     def order_keys_for_uniqueness(k1, k2)
@@ -78,7 +77,7 @@ module SwapConversions
       # 0 = completely unsuccessful, 1 = completely successful
       adjusted_base_score = (base_score - 0.5) * small_group_fudge_factor + 0.5
 
-      return [adjusted_base_score*2, group_size]
+      return [adjusted_base_score * 2, group_size]
     end
 
     def keep_success_count(o, success_counts)
@@ -91,7 +90,7 @@ module SwapConversions
       [
         "SCORING PRINCIPLE: scores (after =>) represent relative success at turning proposed swaps into confirmed swaps.",
         "2.0 means 100% of them, 0.0 means none of them.",
-        "Threshold between marginal and safe seat is a difference between the first two party votes of #{OnsConstituency::MARGINAL_THRESHOLD/100.0}%",
+        "Threshold between marginal and safe seat is a difference between the first two party votes of #{OnsConstituency::MARGINAL_THRESHOLD / 100.0}%",
         "",
         "Values before the => represent the two voters participating in the swap, and what they gain for their preferred party.",
         "E.g. fighting-2-winning indicates that voter's preferred party instead of getting a vote in marginal where they are fighting,",
@@ -105,7 +104,7 @@ module SwapConversions
         .where("ons_constituencies.ons_id IS NOT ?", nil)
         .where("constituencies_users.ons_id IS NOT ?", nil)
         .eager_load([
-          {outgoing_swap: { chosen_user: :constituency }},
+          { outgoing_swap: { chosen_user: :constituency } },
           :constituency
         ])
 
@@ -119,8 +118,9 @@ module SwapConversions
         c2 = Poll::Cache.get_constituency(chooser.constituency_ons_id)
         c1 = Poll::Cache.get_constituency(chosen.constituency_ons_id)
 
-        no_polls = c1.polls_count == 0 || c2.polls_count == 0
-        no_polls ? nil : [chooser.bucket_with(chosen.constituency_ons_id), chosen.bucket_with(chooser.constituency_ons_id), chooser.outgoing_swap.confirmed]
+        no_polls = c1.polls_count.zero? || c2.polls_count.zero?
+        no_polls ? nil : [chooser.bucket_with(chosen.constituency_ons_id),
+                          chosen.bucket_with(chooser.constituency_ons_id), chooser.outgoing_swap.confirmed]
       end.compact.tally
 
       result = Hash.new{ |o, k| o[k] = Hash.new { |o, k| o[k] = 0 } }
