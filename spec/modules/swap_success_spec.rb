@@ -2,7 +2,7 @@ require "rails_helper"
 
 require_relative '../../lib/modules/swap_success'
 
-RSpec.describe SwapSuccess do
+RSpec.describe SwapConversions do
 
   describe ".order_keys_for_uniqueness" do
     let(:key1) { ['aaaa', 123] }

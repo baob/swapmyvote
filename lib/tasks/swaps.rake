@@ -44,9 +44,9 @@ namespace :swaps do
 
       # explain yourself
       puts ""
-      puts SwapSuccess.explanation_lines.join("\n")
+      puts SwapConversions.explanation_lines.join("\n")
 
-      lookup = SwapSuccess.swap_success_lookup
+      lookup = SwapConversions.swap_success_lookup
 
       puts "\n\nsparse map (small groups under 30 eliminated)"
       pp sort_hash_by_value(lookup).select{ |x, y|  y[1] >= 30 }.map{ |x,y| [x, [y[0].round(2), y[1]]]}
@@ -62,7 +62,7 @@ namespace :swaps do
 
       # TODO: explain yourself
 
-      lookup = SwapSuccess.swap_success_lookup
+      lookup = SwapConversions.swap_success_lookup
 
       # -------------------------------- POTENTIAL SWAPS ---------------------------------
 
@@ -81,7 +81,7 @@ namespace :swaps do
         unless no_polls
           k1 = ps.source_user.bucket_with(ps.target_user.constituency_ons_id)
           k2 = ps.target_user.bucket_with(ps.source_user.constituency_ons_id)
-          score = (lookup[ SwapSuccess.order_keys_for_uniqueness(k1,k2) ])
+          score = (lookup[ SwapConversions.order_keys_for_uniqueness(k1,k2) ])
         end
       end.compact.map{ |x, y| x.round(1)} # discard the group count so that same score values get merged in the tally
 
@@ -95,7 +95,7 @@ namespace :swaps do
 
       # TODO: explain yourself
 
-      lookup = SwapSuccess.swap_success_lookup
+      lookup = SwapConversions.swap_success_lookup
 
       # ---------------------- ALL POSSIBLE VARIATIONS OF SWAPS --------------------------
 

@@ -1,4 +1,4 @@
-module SwapSuccess
+module SwapConversions
   SMALL_GROUP_THRESHOLD = 8
 
   class ::User
