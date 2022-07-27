@@ -1,4 +1,4 @@
-require_relative '../modules/swap_success'
+
 
 
 
@@ -30,59 +30,7 @@ namespace :swaps do
   namespace :analysis do
 
     task analysis_setup: :environment do
-
-      class User
-        def dump_and_raise(poll)
-          puts "votes nil problem"
-          puts "poll", poll.attributes
-          puts "user", self.attributes
-          constituency = OnsConstituency.find_by(ons_id: poll.constituency_ons_id)
-          puts "constituency name", constituency.attributes
-          puts "constituency polls", constituency.polls.map(&:attributes)
-          party = Party.find(preferred_party_id)
-          puts "party", party.attributes
-          raise "votes nil problem"
-        end
-
-        def two_polls_from_cache(ons_id)
-          poll1 = Poll::Cache.get(constituency_ons_id: constituency_ons_id, party_id: preferred_party_id)
-          poll2 = Poll::Cache.get(constituency_ons_id: ons_id, party_id: preferred_party_id)
-
-          dump_and_raise(poll1) if poll1&.safe_votes.nil?
-          dump_and_raise(poll2) if poll2&.safe_votes.nil?
-
-          # note: poll from MY constituency is first
-          [poll1, poll2]
-        end
-
-        def effort_reduction(ons_id)
-          polls = two_polls_from_cache(ons_id)
-
-          effort_reduction = polls.first.effort_to_win - polls.last.effort_to_win
-          (effort_reduction/1000.0).ceil
-        end
-
-        def marginal_reduction(ons_id)
-          polls = two_polls_from_cache(ons_id)
-
-          marginal_reduction = (polls.first.effort_to_win.abs - polls.last.effort_to_win.abs)
-          (marginal_reduction/1000.0).round
-        end
-
-        def category_with(ons_id)
-          c1 = Poll::Cache.get_constituency(constituency_ons_id)
-          c2 = Poll::Cache.get_constituency(ons_id)
-
-          old_type = c1&.voter_type(self) || "unknown"
-          new_type = c2&.voter_type(self) || "unknown"
-
-          "#{old_type}-2-#{new_type}"
-        end
-
-        def bucket_with(ons_id)
-          [ category_with(ons_id), effort_reduction(ons_id), marginal_reduction(ons_id) ]
-        end
-      end
+      require_relative '../modules/swap_success'
     end
 
     desc "categorise swap types and show a success metric"
