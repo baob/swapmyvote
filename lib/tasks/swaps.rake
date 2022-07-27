@@ -1,7 +1,3 @@
-
-
-
-
 namespace :swaps do
   desc "Print a CSV of confirmed swaps"
   task csv: :environment do

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-require_relative '../../lib/modules/swap_success'
+require_relative '../../lib/modules/swap_conversions'
 
 RSpec.describe SwapConversions do
 
