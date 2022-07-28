@@ -60,6 +60,11 @@ module SwapConversions
   end
 
   class << self
+
+    def user_bucket_with(user, ons_id)
+      UserUtils.new(user).bucket_with(ons_id)
+    end
+
     def order_keys_for_uniqueness(k1, k2)
       k1.hash > k2.hash ? [k1, k2] : [k2, k1]
     end
