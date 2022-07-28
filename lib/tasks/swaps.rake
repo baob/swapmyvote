@@ -75,9 +75,12 @@ namespace :swaps do
         no_polls = c1.polls_count == 0 || c2.polls_count == 0
 
         unless no_polls
-          k1 = ps.source_user.bucket_with(ps.target_user.constituency_ons_id)
-          k2 = ps.target_user.bucket_with(ps.source_user.constituency_ons_id)
-          score = (lookup[ SwapConversions.order_keys_for_uniqueness(k1,k2) ])
+          source_user_utils = SwapConversions::UserUtils.new(ps.source_user)
+          target_user_utils = SwapConversions::UserUtils.new(ps.target_user)
+
+          k1 = source_user_utils.bucket_with(ps.target_user.constituency_ons_id)
+          k2 = target_user_utils.bucket_with(ps.source_user.constituency_ons_id)
+          score = lookup[ SwapConversions.order_keys_for_uniqueness(k1,k2) ]
         end
       end.compact.map{ |x, y| x.round(1)} # discard the group count so that same score values get merged in the tally
 

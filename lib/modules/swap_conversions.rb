@@ -1,22 +1,27 @@
 module SwapConversions
   SMALL_GROUP_THRESHOLD = 8
 
-  class ::User
+  class UserUtils
+    attr_reader :user
+    def initialize(user)
+      @user = user
+    end
+
     def dump_and_raise(poll)
       puts "votes nil problem"
       puts "poll", poll.attributes
-      puts "user", attributes
+      puts "user", user.attributes
       constituency = OnsConstituency.find_by(ons_id: poll.constituency_ons_id)
-      puts "constituency name", constituency.attributes
-      puts "constituency polls", constituency.polls.map(&:attributes)
-      party = Party.find(preferred_party_id)
+      puts "constituency name", user.constituency.attributes
+      puts "constituency polls", user.constituency.polls.map(&:attributes)
+      party = Party.find(user.preferred_party_id)
       puts "party", party.attributes
       raise "votes nil problem"
     end
 
     def two_polls_from_cache(ons_id)
-      poll1 = Poll::Cache.get(constituency_ons_id: constituency_ons_id, party_id: preferred_party_id)
-      poll2 = Poll::Cache.get(constituency_ons_id: ons_id, party_id: preferred_party_id)
+      poll1 = Poll::Cache.get(constituency_ons_id: user.constituency_ons_id, party_id: user.preferred_party_id)
+      poll2 = Poll::Cache.get(constituency_ons_id: ons_id, party_id: user.preferred_party_id)
 
       dump_and_raise(poll1) if poll1&.safe_votes.nil?
       dump_and_raise(poll2) if poll2&.safe_votes.nil?
@@ -40,11 +45,11 @@ module SwapConversions
     end
 
     def category_with(ons_id)
-      c1 = Poll::Cache.get_constituency(constituency_ons_id)
+      c1 = Poll::Cache.get_constituency(user.constituency_ons_id)
       c2 = Poll::Cache.get_constituency(ons_id)
 
-      old_type = c1&.voter_type(self) || "unknown"
-      new_type = c2&.voter_type(self) || "unknown"
+      old_type = c1&.voter_type(user) || "unknown"
+      new_type = c2&.voter_type(user) || "unknown"
 
       "#{old_type}-2-#{new_type}"
     end
@@ -113,8 +118,10 @@ module SwapConversions
         c1 = Poll::Cache.get_constituency(chosen.constituency_ons_id)
 
         no_polls = c1.polls_count.zero? || c2.polls_count.zero?
-        no_polls ? nil : [chooser.bucket_with(chosen.constituency_ons_id),
-                          chosen.bucket_with(chooser.constituency_ons_id), chooser.outgoing_swap.confirmed]
+
+        no_polls ? nil : [UserUtils.new(chooser).bucket_with(chosen.constituency_ons_id),
+                          UserUtils.new(chosen).bucket_with(chooser.constituency_ons_id),
+                          chooser.outgoing_swap.confirmed]
       end.compact.tally
 
       result = Hash.new{ |o, k| o[k] = Hash.new { |o, k| o[k] = 0 } }
