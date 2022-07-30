@@ -60,4 +60,16 @@ class OnsConstituency < ApplicationRecord
       # return "lose"
     end
   end
+
+  def voter_may_have_defeat_strategy?(party_id)
+    marginal_known? &&
+      (
+        (marginal? && polls_by_marginal_score[0..1].map(&:party_id).include?(party_id)) ||
+        (!marginal? && polls_by_marginal_score[1].party_id == party_id)
+      )
+  end
+
+  def voter_is_primarily_defeater?(user)
+    marginal_known? && !winner_for_user?(user) && !marginal_for_user?(user) && voter_may_have_defeat_strategy?(user.willing_party_id)
+  end
 end
