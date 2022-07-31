@@ -76,31 +76,8 @@ namespace :swaps do
           u1_gain_list.push("willing") if u2_gain > 0
           u2_gain_list.push("willing") if u1_gain > 0
 
-          # does u1 gain by seeing a vote against their enemy in the other constituency
-          if c1.voter_may_have_defeat_strategy?(u1)
-
-            u1_enemy_party_id = c1.party_id_voter_may_want_to_defeat(u1)
-
-            u1_enemy_poll_in_c2 = Poll::Cache.get({party_id: u1_enemy_party_id, constituency_ons_id: c2.ons_id})
-            u1_enemy_votes_in_c2 = u1_enemy_poll_in_c2.safe_votes
-
-            u1_preferred_poll_in_c2 = Poll::Cache.get({party_id: u1.preferred_party_id, constituency_ons_id: c2.ons_id})
-            u1_preferred_votes_in_c2 = u1_preferred_poll_in_c2.safe_votes
-
-            u1_willing_poll_in_c2 = Poll::Cache.get({party_id: u1.willing_party_id, constituency_ons_id: c2.ons_id})
-            u1_willing_votes_in_c2 = u1_willing_poll_in_c2.safe_votes
-
-            if ((u1_preferred_votes_in_c2 > u1_enemy_votes_in_c2) && (u1_enemy_votes_in_c2 > u1_willing_votes_in_c2 ))
-              u1_defeat_enemy_remote = true
-            else
-              u1_defeat_enemy_remote = false
-            end
-          else
-            u1_defeat_enemy_remote = false
-          end
-
-
-          u1_may_be_a_defeater = c1.voter_may_have_defeat_strategy?(u1) || u1_defeat_enemy_remote
+          u1_may_be_a_defeater = c1.voter_may_have_defeat_strategy?(u1) ||
+                                 c2.voter_may_have_defeat_strategy?(u1)
           u2_may_be_a_defeater = c2.voter_may_have_defeat_strategy?(u2) ||
                                  c1.voter_may_have_defeat_strategy?(u2)
 
