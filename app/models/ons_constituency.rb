@@ -76,8 +76,4 @@ class OnsConstituency < ApplicationRecord
         top_two.last == user.willing_party_id &&
         top_two.first != user.preferred_party_id
   end
-
-  def voter_is_primarily_defeater?(user)
-    marginal_known? && !winner_for_user?(user) && !marginal_for_user?(user) && voter_may_have_defeat_strategy?(user)
-  end
 end
