@@ -176,6 +176,8 @@ namespace :swaps do
         .where("ons_constituencies.ons_id IS NOT ?", nil)
         .where("constituencies_users.ons_id IS NOT ?", nil) # .all.map{ |x| :fred}
 
+      voters_scores = Hash.new { |o,k| o[k] = []}
+
       p_swap_scores = all_p_swaps.map do |ps|
 
         c2 = Poll::Cache.get_constituency(ps.target_user.constituency_ons_id)
@@ -191,11 +193,14 @@ namespace :swaps do
 
           score = lookup[ SwapConversions.order_keys_for_uniqueness(k1, k2) ] || 0
         end
+        voters_scores[ps.source_user.id].push(score)
+        score
       end.compact.map{ |x, y| x.round(1)} # discard the group count so that same score values get merged in the tally
 
       puts "\n\nFor all potential swaps, show percentage splits for each possible score.  score => percentage of potential swaps with that score"
       pp p_swap_scores.tally.sort.map{ |k,v| [k, (v*100.0/p_swap_scores.size).round(1)]}.to_h ; nil
       puts "percentage of potential swaps evaluated #{(p_swap_scores.size*100.0/all_p_swaps.size).round(1)}"
+
     end
 
     desc "classify swaps into buckets - figure out the conversion score over every potential swap"
