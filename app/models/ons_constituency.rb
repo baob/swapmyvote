@@ -78,9 +78,16 @@ class OnsConstituency < ApplicationRecord
   end
 
   def party_voter_may_want_to_defeat(user)
-    return "unknown" unless voter_may_have_defeat_strategy?(user)
+    party_id = party_id_voter_may_want_to_defeat(user)
+    return "unknown" unless party_id
+    return Party.find(party_id).name
+  end
+
+  def party_id_voter_may_want_to_defeat(user)
+    return nil unless voter_may_have_defeat_strategy?(user)
     return polls_by_votes.first.party_id
   end
+
 
   def voter_strategy(user)
     return nil unless voter_may_have_defeat_strategy?(user)
