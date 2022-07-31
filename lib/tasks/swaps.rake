@@ -186,20 +186,24 @@ namespace :swaps do
         no_polls = c1.polls_count == 0 || c2.polls_count == 0
 
         if no_polls
-          score = 0
+          score = [0, 0]
         else
           k1 = SwapConversions.user_bucket_with(ps.source_user, ps.target_user.constituency_ons_id)
           k2 = SwapConversions.user_bucket_with(ps.target_user, ps.source_user.constituency_ons_id)
 
-          score = lookup[ SwapConversions.order_keys_for_uniqueness(k1, k2) ] || 0
+          score = lookup[ SwapConversions.order_keys_for_uniqueness(k1, k2) ] || [0, 0]
         end
-        voters_scores[ps.source_user.id].push(score)
+        # puts "score-diag-1 #{score}" ; raise 'stop now'
+        voters_scores[ps.source_user.id].push(score.first)
         score
       end.compact.map{ |x, y| x.round(1)} # discard the group count so that same score values get merged in the tally
 
       puts "\n\nFor all potential swaps, show percentage splits for each possible score.  score => percentage of potential swaps with that score"
       pp p_swap_scores.tally.sort.map{ |k,v| [k, (v*100.0/p_swap_scores.size).round(1)]}.to_h ; nil
       puts "percentage of potential swaps evaluated #{(p_swap_scores.size*100.0/all_p_swaps.size).round(1)}"
+
+      puts "\n\npercentage splits for the average score for each user"
+      pp voters_scores.map{ |id, score_list|  ((score_list.sum)/Float(score_list.size)).round(1)  }.tally.sort.map{ |k,v| [k, (v*100.0/voters_scores.size).round(1)]}.to_h
 
     end
 
