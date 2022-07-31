@@ -41,8 +41,13 @@ class OnsConstituency < ApplicationRecord
     @marginal_known = polls_count > 0
   end
 
+  def top_two_party_ids
+    return @top_two_party_ids if defined?(@top_two_party_ids)
+    @top_two_party_ids = polls_by_votes.limit(2).pluck(:party_id)
+  end
+
   def winner_for_user?(user)
-    marginal_known? && !marginal? && polls_by_votes.first.party_id == user.preferred_party_id
+    marginal_known? && !marginal? && top_two_party_ids.first == user.preferred_party_id
   end
 
   def loser_for_user?(user)
@@ -50,7 +55,7 @@ class OnsConstituency < ApplicationRecord
   end
 
   def marginal_for_user?(user)
-    marginal_known? && marginal? && polls_by_votes[0..1].map(&:party_id).include?(user.preferred_party_id)
+    marginal_known? && marginal? && top_two_party_ids.include?(user.preferred_party_id)
   end
 
   def voter_type(user)
@@ -69,12 +74,10 @@ class OnsConstituency < ApplicationRecord
   def voter_may_have_defeat_strategy?(user)
     return false unless marginal_known?
 
-    top_two = polls_by_votes[0..1].map(&:party_id)
-
     marginal_known? &&
         loser_for_user?(user) &&
-        top_two.last == user.willing_party_id &&
-        top_two.first != user.preferred_party_id
+        top_two_party_ids.last == user.willing_party_id &&
+        top_two_party_ids.first != user.preferred_party_id
   end
 
   def party_voter_may_want_to_defeat(user)
