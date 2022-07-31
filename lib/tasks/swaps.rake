@@ -82,8 +82,8 @@ namespace :swaps do
 
           pairs[swap.id] = [u1_type, u2_type].sort.join("-SWAPPED_WITH-")
 
-          voters[u1.id] = u1_type + (c1.voter_is_primarily_defeater?(u1) ? "-defeater" : "")
-          voters[u2.id] = u2_type + (c2.voter_is_primarily_defeater?(u2) ? "-defeater" : "")
+          voters[u1.id] = u1_type + (c1.voter_is_primarily_defeater?(u1) ? "-defeat?" : "")
+          voters[u2.id] = u2_type + (c2.voter_is_primarily_defeater?(u2) ? "-defeat?" : "")
 
           voter_gains[u1.id] = u1_type + "-GAINS-" + u1_gain_words
           voter_gains[u2.id] = u2_type + "-GAINS-" + u2_gain_words
@@ -119,7 +119,7 @@ namespace :swaps do
       not_swaps.each do |user|
         c1 = Poll::Cache.get_constituency(user.constituency_ons_id)
         unless c1.nil? || user.preferred_party_id.nil?
-          type = c1.voter_type(user) + (c1.voter_is_primarily_defeater?(user) ? "-defeater" : "")
+          type = c1.voter_type(user) + (c1.voter_is_primarily_defeater?(user) ? "-defeat?" : "")
           not_swap_result[user.id] = type
         end
       end
