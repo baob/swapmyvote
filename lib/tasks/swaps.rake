@@ -61,22 +61,6 @@ namespace :swaps do
         voters[u1.id] = u1_type + (c1.voter_may_have_defeat_strategy?(u1) ? "-defeat?" : "")
         voters[u2.id] = u2_type + (c2.voter_may_have_defeat_strategy?(u2) ? "-defeat?" : "")
 
-        if (u1_type == 'win' && c1.voter_may_have_defeat_strategy?(u1) )
-
-          puts "win defeat ???"
-          pp u1.attributes
-          pp c1.polls.pluck(:party_id, :votes, :marginal_score)
-
-          raise 'stop here'
-        end
-        if (u2_type == 'win' && c2.voter_may_have_defeat_strategy?(u2) )
-
-          puts "win defeat ???"
-          pp u2.attributes
-          pp c2.polls_by_votes.pluck(:party_id, :votes, :marginal_score)
-          raise 'stop here'
-        end
-
         no_polls = c1.polls_count == 0 || c2.polls_count == 0
 
         unless no_polls
