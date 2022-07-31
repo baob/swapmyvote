@@ -34,14 +34,14 @@ module SwapConversions
       polls = two_polls_from_cache(ons_id)
 
       effort_reduction = polls.first.effort_to_win - polls.last.effort_to_win
-      (effort_reduction / 2000.0).round
+      (effort_reduction / 1000.0).round
     end
 
     def marginal_reduction(ons_id)
       polls = two_polls_from_cache(ons_id)
 
       marginal_reduction = (polls.first.effort_to_win.abs - polls.last.effort_to_win.abs)
-      (marginal_reduction / 2000.0).round
+      (marginal_reduction / 1000.0).round
     end
 
     def category_with(ons_id)
