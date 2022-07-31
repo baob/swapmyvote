@@ -69,8 +69,8 @@ class OnsConstituency < ApplicationRecord
   def voter_may_have_defeat_strategy?(party_id)
     marginal_known? &&
       (
-        (marginal? && polls_by_marginal_score[0..1].map(&:party_id).include?(party_id)) ||
-        (!marginal? && polls_by_marginal_score[1].party_id == party_id)
+        (marginal? && polls_by_votes[0..1].map(&:party_id).include?(party_id)) ||
+        (!marginal? && polls_by_votes[1].party_id == party_id)
       )
   end
 
