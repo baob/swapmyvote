@@ -55,11 +55,15 @@ namespace :swaps do
         c1 = Poll::Cache.get_constituency(u1.constituency_ons_id)
         c2 = Poll::Cache.get_constituency(u2.constituency_ons_id)
 
+        u1_type = c1.voter_type(u1)
+        u2_type = c2.voter_type(u2)
+
+        voters[u1.id] = u1_type + (c1.voter_is_primarily_defeater?(u1) ? "-defeat?" : "")
+        voters[u2.id] = u2_type + (c2.voter_is_primarily_defeater?(u2) ? "-defeat?" : "")
+
         no_polls = c1.polls_count == 0 || c2.polls_count == 0
 
         unless no_polls
-          u1_type = c1.voter_type(u1)
-          u2_type = c2.voter_type(u2)
 
           u1_gain = SwapConversions::UserUtils.new(u1).effort_reduction(u2.constituency_ons_id)
           u2_gain = SwapConversions::UserUtils.new(u2).effort_reduction(u1.constituency_ons_id)
@@ -82,8 +86,6 @@ namespace :swaps do
 
           pairs[swap.id] = [u1_type, u2_type].sort.join("-SWAPPED_WITH-")
 
-          voters[u1.id] = u1_type + (c1.voter_is_primarily_defeater?(u1) ? "-defeat?" : "")
-          voters[u2.id] = u2_type + (c2.voter_is_primarily_defeater?(u2) ? "-defeat?" : "")
 
           voter_gains[u1.id] = u1_type + "-GAINS-" + u1_gain_words
           voter_gains[u2.id] = u2_type + "-GAINS-" + u2_gain_words
