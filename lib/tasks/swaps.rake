@@ -58,8 +58,24 @@ namespace :swaps do
         u1_type = c1.voter_type(u1)
         u2_type = c2.voter_type(u2)
 
-        voters[u1.id] = u1_type + (c1.voter_is_primarily_defeater?(u1) ? "-defeat?" : "")
-        voters[u2.id] = u2_type + (c2.voter_is_primarily_defeater?(u2) ? "-defeat?" : "")
+        voters[u1.id] = u1_type + (c1.voter_may_have_defeat_strategy?(u1.willing_party_id) ? "-defeat?" : "")
+        voters[u2.id] = u2_type + (c2.voter_may_have_defeat_strategy?(u2.willing_party_id) ? "-defeat?" : "")
+
+        if (u1_type == 'win' && c1.voter_may_have_defeat_strategy?(u1.willing_party_id) )
+
+          puts "win defeat ???"
+          pp u1.attributes
+          pp c1.polls.pluck(:party_id, :votes, :marginal_score)
+
+          raise 'stop here'
+        end
+        if (u2_type == 'win' && c2.voter_may_have_defeat_strategy?(u2.willing_party_id) )
+
+          puts "win defeat ???"
+          pp u2.attributes
+          pp c2.polls_by_votes.pluck(:party_id, :votes, :marginal_score)
+          raise 'stop here'
+        end
 
         no_polls = c1.polls_count == 0 || c2.polls_count == 0
 
@@ -109,7 +125,7 @@ namespace :swaps do
       not_swaps.each do |user|
         c1 = Poll::Cache.get_constituency(user.constituency_ons_id)
         unless c1.nil? || user.preferred_party_id.nil?
-          type = c1.voter_type(user) + (c1.voter_is_primarily_defeater?(user) ? "-defeat?" : "")
+          type = c1.voter_type(user) + (c1.voter_may_have_defeat_strategy?(user.willing_party_id) ? "-defeat?" : "")
           not_swap_result[user.id] = type
         end
       end
