@@ -66,15 +66,15 @@ class OnsConstituency < ApplicationRecord
     end
   end
 
-  def voter_may_have_defeat_strategy?(party_id)
+  def voter_may_have_defeat_strategy?(user)
     marginal_known? &&
       (
-        (marginal? && polls_by_votes[0..1].map(&:party_id).include?(party_id)) ||
-        (!marginal? && polls_by_votes[1].party_id == party_id)
+        (marginal? && polls_by_votes[0..1].map(&:party_id).include?(user.willing_party_id)) ||
+        (!marginal? && polls_by_votes[1].party_id == user.willing_party_id)
       )
   end
 
   def voter_is_primarily_defeater?(user)
-    marginal_known? && !winner_for_user?(user) && !marginal_for_user?(user) && voter_may_have_defeat_strategy?(user.willing_party_id)
+    marginal_known? && !winner_for_user?(user) && !marginal_for_user?(user) && voter_may_have_defeat_strategy?(user)
   end
 end

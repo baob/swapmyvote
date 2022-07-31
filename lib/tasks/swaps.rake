@@ -58,10 +58,10 @@ namespace :swaps do
         u1_type = c1.voter_type(u1)
         u2_type = c2.voter_type(u2)
 
-        voters[u1.id] = u1_type + (c1.voter_may_have_defeat_strategy?(u1.willing_party_id) ? "-defeat?" : "")
-        voters[u2.id] = u2_type + (c2.voter_may_have_defeat_strategy?(u2.willing_party_id) ? "-defeat?" : "")
+        voters[u1.id] = u1_type + (c1.voter_may_have_defeat_strategy?(u1) ? "-defeat?" : "")
+        voters[u2.id] = u2_type + (c2.voter_may_have_defeat_strategy?(u2) ? "-defeat?" : "")
 
-        if (u1_type == 'win' && c1.voter_may_have_defeat_strategy?(u1.willing_party_id) )
+        if (u1_type == 'win' && c1.voter_may_have_defeat_strategy?(u1) )
 
           puts "win defeat ???"
           pp u1.attributes
@@ -69,7 +69,7 @@ namespace :swaps do
 
           raise 'stop here'
         end
-        if (u2_type == 'win' && c2.voter_may_have_defeat_strategy?(u2.willing_party_id) )
+        if (u2_type == 'win' && c2.voter_may_have_defeat_strategy?(u2) )
 
           puts "win defeat ???"
           pp u2.attributes
@@ -89,10 +89,10 @@ namespace :swaps do
           u1_gain_list.push("willing") if u2_gain > 0
           u2_gain_list.push("willing") if u1_gain > 0
 
-          u1_may_be_a_defeater = c1.voter_may_have_defeat_strategy?(u1.willing_party_id) ||
-                                 c2.voter_may_have_defeat_strategy?(u1.preferred_party_id)
-          u2_may_be_a_defeater = c2.voter_may_have_defeat_strategy?(u2.willing_party_id) ||
-                                 c1.voter_may_have_defeat_strategy?(u2.preferred_party_id)
+          u1_may_be_a_defeater = c1.voter_may_have_defeat_strategy?(u1) ||
+                                 c2.voter_may_have_defeat_strategy?(u1)
+          u2_may_be_a_defeater = c2.voter_may_have_defeat_strategy?(u2) ||
+                                 c1.voter_may_have_defeat_strategy?(u2)
 
           u1_gain_list = u1_may_be_a_defeater ? ["defeat"] : ["none"] if u1_gain_list.size == 0
           u2_gain_list = u2_may_be_a_defeater ? ["defeat"] : ["none"] if u2_gain_list.size == 0
@@ -125,7 +125,7 @@ namespace :swaps do
       not_swaps.each do |user|
         c1 = Poll::Cache.get_constituency(user.constituency_ons_id)
         unless c1.nil? || user.preferred_party_id.nil?
-          type = c1.voter_type(user) + (c1.voter_may_have_defeat_strategy?(user.willing_party_id) ? "-defeat?" : "")
+          type = c1.voter_type(user) + (c1.voter_may_have_defeat_strategy?(user) ? "-defeat?" : "")
           not_swap_result[user.id] = type
         end
       end
