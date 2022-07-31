@@ -205,6 +205,11 @@ namespace :swaps do
       puts "\n\npercentage splits for the average score for each user"
       pp voters_scores.map{ |id, score_list|  ((score_list.sum)/Float(score_list.size)).round(1)  }.tally.sort.map{ |k,v| [k, (v*100.0/voters_scores.size).round(1)]}.to_h
 
+
+      puts "\n\npercentage splits for the number of potential swaps for each user"
+      pp voters_scores.map{ |id, score_list|  score_list.size }.tally.sort.map{ |k,v| [k, (v*100.0/voters_scores.size).round(1)]}.to_h
+
+
     end
 
     desc "classify swaps into buckets - figure out the conversion score over every potential swap"
