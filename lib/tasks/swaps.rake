@@ -58,8 +58,11 @@ namespace :swaps do
         u1_type = c1.voter_type(u1)
         u2_type = c2.voter_type(u2)
 
-        voters[u1.id] = u1_type + (c1.voter_may_have_defeat_strategy?(u1) ? "-defeat?" : "")
-        voters[u2.id] = u2_type + (c2.voter_may_have_defeat_strategy?(u2) ? "-defeat?" : "")
+        u1_strategy = c1.voter_strategy(u1)
+        u2_strategy = c2.voter_strategy(u2)
+
+        voters[u1.id] = u1_type + (u1_strategy ? "-#{u1_strategy}" : "")
+        voters[u2.id] = u2_type + (u2_strategy ? "-#{u2_strategy}" : "")
 
         no_polls = c1.polls_count == 0 || c2.polls_count == 0
 
@@ -109,7 +112,8 @@ namespace :swaps do
       not_swaps.each do |user|
         c1 = Poll::Cache.get_constituency(user.constituency_ons_id)
         unless c1.nil? || user.preferred_party_id.nil?
-          type = c1.voter_type(user) + (c1.voter_may_have_defeat_strategy?(user) ? "-defeat?" : "")
+          strategy = c1.voter_strategy(user)
+          type = c1.voter_type(user) + ( strategy ? "-#{strategy}" : "")
           not_swap_result[user.id] = type
         end
       end

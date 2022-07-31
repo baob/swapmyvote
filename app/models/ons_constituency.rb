@@ -76,4 +76,14 @@ class OnsConstituency < ApplicationRecord
         top_two.last == user.willing_party_id &&
         top_two.first != user.preferred_party_id
   end
+
+  def party_voter_may_want_to_defeat(user)
+    return "unknown" unless voter_may_have_defeat_strategy?(user)
+    return polls_by_votes.first.party_id
+  end
+
+  def voter_strategy(user)
+    return nil unless voter_may_have_defeat_strategy?(user)
+    return "defeat-#{party_voter_may_want_to_defeat(user)}"
+  end
 end
