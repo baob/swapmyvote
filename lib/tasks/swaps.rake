@@ -95,20 +95,8 @@ namespace :swaps do
         end
       end
 
-      puts "\n\nVOTERS -", threshold_text
+      puts "\n\nVOTERS (SWAPPERS) CLASSIFIED -", threshold_text
       pp sort_hash_by_value(voters.map{ |(id,type)| type }.tally)
-
-      puts "\n\nVOTER PAIRS -", threshold_text
-      pp sort_hash_by_value(pairs.map{ |(id,type)| type }.tally)
-
-      puts "\n\nIMMEDIATE VOTER GAINS -", threshold_text
-      pp sort_hash_by_value(voter_gains.map{ |(id,type)| type }.tally)
-
-      puts "\n\nDIFFERENTIAL GAINS -", threshold_text
-      pp sort_hash_by_value( diff_gains.map{ |(id,type)| type }.tally )
-
-      puts "\n\n3-WAY DIFFERENTIAL GAINS -", threshold_text
-      pp sort_hash_by_value(diff_3_gains.map{ |(id,type)| type }.tally)
 
       swapper_ids = voters.map{ |(id, type)| id}
 
@@ -124,8 +112,23 @@ namespace :swaps do
         end
       end
 
-      puts "\n\nUSERS WHO DIDN'T SWAP -", threshold_text
+      puts "\n\nVOTERS (NOT SWAPPED) CLASSIFIED -", threshold_text
       pp sort_hash_by_value(not_swap_result.map{ |(id,type)| type }.tally)
+
+
+      puts "\n\nVOTER PAIRS -", threshold_text
+      pp sort_hash_by_value(pairs.map{ |(id,type)| type }.tally)
+
+      puts "\n\nIMMEDIATE VOTER GAINS -", threshold_text
+      pp sort_hash_by_value(voter_gains.map{ |(id,type)| type }.tally)
+
+      puts "\n\nDIFFERENTIAL GAINS -", threshold_text
+      pp sort_hash_by_value( diff_gains.map{ |(id,type)| type }.tally )
+
+      puts "\n\n3-WAY DIFFERENTIAL GAINS -", threshold_text
+      pp sort_hash_by_value(diff_3_gains.map{ |(id,type)| type }.tally)
+
+
 
     end
 
