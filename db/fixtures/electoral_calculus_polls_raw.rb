@@ -1,5 +1,4 @@
 require "csv"
-require "yaml"
 require_relative "constituencies_original_with_ons_csv"
 require_relative "electoral_calculus_constituencies_tsv"
 
@@ -55,9 +54,6 @@ class ElectoralCalculusConstituenciesPollsRaw
 
     puts "\n\nConstituencies where no ONS id found (count: #{failed_ons_lookup.size})"
     pp failed_ons_lookup.to_a.sort
-
-    yaml_lookup_for_edit = failed_ons_lookup.to_a.each_with_object({}) { |name, index| index[name] = {ons_id: nil, name: nil} }
-    File.open("ec_misses.yml", 'w') { |f| YAML.dump(yaml_lookup_for_edit, f) }
   end
 
   def party_and_constituency_data(vote_data, party, constituency_ons_id)
