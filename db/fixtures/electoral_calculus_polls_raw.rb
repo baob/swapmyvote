@@ -91,6 +91,10 @@ class ElectoralCalculusConstituenciesPollsRaw
     ons_id = my_soc_constituency_ons_ids_by_name[alt_name]
     return ons_id if ons_id
 
+    manual_map_name = manual_map_name_from_ec(name)
+    ons_id = my_soc_constituency_ons_ids_by_name[manual_map_name]
+    return ons_id if ons_id
+
     return nil
   end
 
@@ -103,6 +107,14 @@ class ElectoralCalculusConstituenciesPollsRaw
     end
 
     return @my_soc_constituency_ons_ids_by_name = hash
+  end
+
+  private def manual_map
+    defined?(@manual_map) ? @manual_map : @manual_map = YAML.load_file("db/fixtures/electoral_calculus_constituency_mapping_to_mysoc.yml")
+  end
+
+  private def  manual_map_name_from_ec(name)
+    manual_map[name]
   end
 
   private def alternative_compass_names_for_ec(name)
