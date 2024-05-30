@@ -56,7 +56,7 @@ class ElectoralCalculusConstituenciesPollsRaw
     puts "\n\nConstituencies where no ONS id found (count: #{failed_ons_lookup.size})"
     pp failed_ons_lookup.to_a.sort
 
-    yaml_lookup_for_edit = failed_ons_lookup.to_a.sort.each_with_object({}) { |name, index| index[name] = nil }
+    yaml_lookup_for_edit = failed_ons_lookup.to_a.each_with_object({}) { |name, index| index[name] = {ons_id: nil, name: nil} }
     File.open("ec_misses.yml", 'w') { |f| YAML.dump(yaml_lookup_for_edit, f) }
   end
 
