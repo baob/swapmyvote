@@ -33,6 +33,12 @@ class Party < ApplicationRecord
     return true
   end
 
+  def short_name
+    short = smv_code ? REFERENCE_DATA[smv_code.to_sym][:short_name] : nil
+    short ||= name.downcase.gsub(/[aeiou]/, "")[0..2].titleize
+    short
+  end
+
   class << self
     def canonical_names
       master_list.map { |p| p[:canonical_name].to_s }
