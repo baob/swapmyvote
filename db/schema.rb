@@ -48,7 +48,6 @@ ActiveRecord::Schema.define(version: 2024_06_16_111118) do
   create_table "parties", force: :cascade do |t|
     t.string "name"
     t.string "color"
-    t.string "short_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "smv_code"

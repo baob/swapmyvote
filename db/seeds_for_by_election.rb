@@ -18,7 +18,7 @@ end
 puts "\nParties"
 
 Db::Fixtures::Be2022::Party.all.each do |party|
-  ::Party.find_or_create_by(name: party[:name], short_name: party[:short_name], color: party[:colour])
+  ::Party.find_or_create_by(name: party[:name], color: party[:colour])
   puts "Party #{party[:name]} created"
 end
 
