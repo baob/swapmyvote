@@ -135,7 +135,8 @@ class User < ApplicationRecord
       .where.not(users: { id: user_ids_we_dont_want }) # Ignore if already included in potential swaps, or if me
       .where.not(users: { constituency_ons_id: constituency_ons_id }) # Ignore if my constituency
     return base_query
-      .joins(["JOIN recommended_parties on recommended_parties.constituency_ons_id = users.constituency_ons_id and recommended_parties.party_id = users.willing_party_id and recommended_parties.site = \"stop-the-tories\" ", ])
+      .joins("JOIN recommended_parties on recommended_parties.constituency_ons_id = users.constituency_ons_id and recommended_parties.party_id = users.willing_party_id")
+      .where("recommended_parties.site = ?", "sprint-for-pr")
   end
 
   private def one_swap_from_possible_users(user_query)
