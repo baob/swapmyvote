@@ -109,7 +109,7 @@ class User < ApplicationRecord
   end
 
   def try_to_create_potential_swap
-    swaps = complementary_voters.where("constituency_ons_id like '_%'")
+    swaps = complementary_voters.where("users.constituency_ons_id like '_%'")
     return one_swap_from_possible_users(swaps)
   end
 
@@ -123,7 +123,7 @@ class User < ApplicationRecord
   private def complementary_voters
     user_ids_already_in_potential_swaps = potential_swaps.reload.map(&:target_user_id)
     user_ids_we_dont_want = user_ids_already_in_potential_swaps + [id]
-    User
+    base_query = User
       .left_joins(:incoming_swap, :outgoing_swap)
       .where(
         preferred_party_id: willing_party_id,
@@ -134,6 +134,8 @@ class User < ApplicationRecord
       .where("outgoing_swaps_users.id IS ?", nil) # not in an outgoing swap
       .where.not(users: { id: user_ids_we_dont_want }) # Ignore if already included in potential swaps, or if me
       .where.not(users: { constituency_ons_id: constituency_ons_id }) # Ignore if my constituency
+    return base_query
+      .joins(["JOIN recommended_parties on recommended_parties.constituency_ons_id = users.constituency_ons_id and recommended_parties.party_id = users.willing_party_id and recommended_parties.site = \"stop-the-tories\" ", ])
   end
 
   private def one_swap_from_possible_users(user_query)
