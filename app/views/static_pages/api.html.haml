@@ -1,6 +1,6 @@
 -# haml-lint: disable ViewLength
 - content_for(:meta_og_description) do
-  Make votes matter! Swap yours with someone in a constituency where both could count for more. You get to vote for who you really want, and help someone else do the same. Turn tactical voting into a win-win!
+  Make votes matter! Swap yours with someone in a state where both could count for more. You get to vote for who you really want, and help someone else do the same. Turn tactical voting into a win-win!
 .plain-pattern.border-bottom
   .container.api
     %h1 Swap My Vote API
@@ -45,11 +45,11 @@
         %code
           constituency_name
       %dd
-        The name of the default constituency for the user post-login.
+        The name of the default state for the user post-login.
         This is useful if you want to refer a user for tactical voting
-        and you know in which constituency they are registered to vote,
-        as it will save them manually selecting that constituency.
-        The name must match one of the constituencies in the
+        and you know in which state they are registered to vote,
+        as it will save them manually selecting that state.
+        The name must match one of the states in the
         %code name
         field of
         = link_to("this data set", constituency_ons_id_dataset_url,
@@ -64,7 +64,7 @@
         %code constituency_name
 
         above, except that rather than the name, it's the ONS id of
-        the constituency listed in the
+        the state listed in the
 
         %code gss_code
 
@@ -93,7 +93,7 @@
       This one would also work, but rather than specify the tactical vote,
       instead specifies the user’s preferred party (randomly chosen)
       = party2
-      \. This time their constituency is York Outer (specified by ONS code).
+      \. This time their state is York Outer (specified by ONS code).
 
     %p
       - url2 = swap_url(preferred_party_name: party2.parameterize.gsub('-', '_'),
