@@ -237,6 +237,14 @@ module ApplicationHelper
     @election_institution = institution
   end
 
+  def voting_area_singular
+    "constituency"
+  end
+
+  def voting_area_plural
+    "constituencies"
+  end
+
   def general_election?
     !election_type_override.nil? ?
       (election_type_override == :general) :
