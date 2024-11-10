@@ -27,7 +27,7 @@
                                   { class: "form-control" }
 
           .form-group.required
-            %label.mb-0 My state is
+            %label.mb-0 My #{voting_area_singular} is
             %br
             = f.collection_select :constituency_ons_id, @constituencies,
                                   :ons_id, :name,
