@@ -13,7 +13,7 @@
     declined, please
 
     = succeed "." do
-      = link_to "review whether #{@user.willing_party.name} in your state is helpful to potential vote swap partners.", review_user_url + utm
+      = link_to "review whether #{@user.willing_party.name} in your #{voting_area_singular} is helpful to potential vote swap partners.", review_user_url + utm
 
 %p
   If you just haven't had time to look for a swap yet, or were waiting
