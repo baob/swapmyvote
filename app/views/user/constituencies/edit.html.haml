@@ -13,7 +13,7 @@
             = link_to "Your details will stay private with us.", privacy_path
 
       %p.ui-widget
-        My state is
+        = "My #{voting_area_singular} is"
         = f.collection_select :constituency_ons_id, @constituencies,
                               :ons_id, :name,
                               selected: @default_constituency_ons_id,
